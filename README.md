@@ -50,7 +50,7 @@ conda env create -n FIERCE --file FIERCE.yml
 ```
 or 
 
-2- Create the `FIERCE` environment using a single pre-defined Anaconda command
+2- Creating the `FIERCE` environment using a single pre-defined Anaconda command
 
 To install the environment open your terminal and run:
 
