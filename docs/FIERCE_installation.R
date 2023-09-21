@@ -20,7 +20,7 @@ devtools::install_github(
   "bicciatolab/FIERCE",
   ref = "HEAD",
   subdir = NULL,
-  auth_token = " ",
+  auth_token = "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",
   host = "api.github.com",
   dependencies = NA,
   upgrade = c("default", "ask", "always", "never"),
