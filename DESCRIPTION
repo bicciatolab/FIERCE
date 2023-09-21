@@ -1,0 +1,22 @@
+Package: FIERCE
+Type: Package
+Title: Framework for InfERence of veloCity of the Entropy
+Version: 0.1.0
+Author: Luca Calderoni, Francesco Grandi, Silvio Bicciato, Oriana Romano and Mattia Forcato  
+Maintainer: Luca Calderoni <luca.calderoni@unimore.it> Francesco Grandi <francesco.grandi1993@unimore.it>
+Description: ...............
+License: GPL3
+Encoding: UTF-8
+Depends:
+    reticulate,
+    SCENT,
+    Seurat,
+    ggplot2,
+    reshape2,
+    scales,
+    usethis,
+    tools,
+    usethis,
+    R (>= 3.5.0)
+LazyData: true
+RoxygenNote: 7.2.1
