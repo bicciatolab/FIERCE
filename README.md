@@ -21,7 +21,7 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 * Dependencies: *reticulate*, *SCENT*, *Seurat*, *SeuratObject*, *ggplot2*, *reshape2*, *scales*, *usethis*, *tools*, *usethis*.
 
 * Python version: >= 3.10
-* Dependencies: *numpy*, *scipy*, *cython*, *numba*, *matplotlib*, *scikit-learn*, *h5py*, *click*, *velocyto*, *scvelo*,*pandas*.
+* Dependencies: *numpy*, *scipy*, *cython*, *numba*, *matplotlib*, *scikit-learn*, *h5py*, *click*, *velocyto*, *scvelo*, *pandas*.
 
 ## Installation
 
