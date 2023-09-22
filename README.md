@@ -77,7 +77,7 @@ python -m pip install cython
 pip3 install velocyto==0.17.17 scvelo scikit-learn
 ```
 
-Since not all required R packages are provided in anaconda.org, some packages must be installed directly from the console, as described in [install packages in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r).
+Since not all required R packages are provided by anaconda.org, some packages must be directly installed from the console, as described in [install packages in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r).
 
 #### Install packages in R
 
