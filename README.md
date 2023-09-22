@@ -108,7 +108,7 @@ if(!"SCENT"%in% installed.packages()[,"Package"]){devtools::install_github("aet2
 
 ```
 
-Once installed all dependencies, `FIERCE` can be installed with the following script:
+Once all dependencies have been installed, `FIERCE` can be installed with the following script:
 
 ```r
 devtools::install_github("bicciatolab/FIERCE")
