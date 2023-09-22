@@ -37,38 +37,39 @@ On a Linux system, a working Anaconda environment for `FIERCE` can be set exploi
 
 1- Generating the `FIERCE` environment from a .yml file
 
-According to this installation procedure, a provided pre-configured working environment can be downloaded from your terminal using the command
+   According to this installation procedure, a provided pre-configured working environment can be downloaded from your terminal using the command
 
-```bash
-wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE.yml
-```
+  ```bash
+  wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE.yml
+  ```
 
-and then cloned with 
+  and then cloned with 
 
-```bash
-conda env create -n FIERCE --file FIERCE.yml
-```
+  ```bash
+  conda env create -n FIERCE --file FIERCE.yml
+  ```
+
 or 
 
 2- Creating the `FIERCE` environment using a single pre-defined Anaconda command
 
-To install the environment open your terminal and run:
+  To install the environment open your terminal and run:
 
-```bash
-conda create --name FIERCE -c conda-forge r-base=4.0.5 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3.6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=3.11.0 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
-```
+  ```bash
+  conda create --name FIERCE -c conda-forge r-base=4.0.5 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3. 6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=3.11.0 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
+  ```
 
-Whatever the strategy applied, once created the environment, it may be accessed through the command:
+  Whatever the strategy applied, once created the environment, it may be accessed through the command:
 
-```bash
-conda activate FIERCE
-```
+  ```bash
+  conda activate FIERCE
+  ```
 
 and the last dependencies must be installed as explained below
 
 #### Install Python packages
 
-accessed the environment use the following lines of code on your terminal to install the remaining mandatory python packages:
+Attached the environment use the following lines of code on your terminal to install the remaining mandatory python packages:
 
 ```python
 python -m pip install cython
