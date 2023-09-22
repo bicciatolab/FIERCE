@@ -37,7 +37,7 @@ On a Linux system, a working Anaconda environment for `FIERCE` can be set exploi
 
 1- Creating the `FIERCE` environment from a .yml file
 
-   According to this installation procedure, a pre-configured working environment can be downloaded on your terminal using the command
+  According to this installation procedure, a pre-configured working environment can be downloaded on your terminal using the command
 
   ```bash
   wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE.yml
