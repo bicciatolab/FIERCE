@@ -25,13 +25,13 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 
 ## Installation
 
-To install `FIERCE` package, especially if working on a Linux machine, we strongly recommend the use of an Anaconda virtual environment to avoid conflicts between package's dependencies versions.
+To install `FIERCE` package, especially if working on a Linux machine, we strongly recommend the use of an Anaconda virtual environment to avoid conflicts between the versions of dependencies.
 
-If Anaconda is already installed on your system, a virtual environment for `FIERCE` can be set either manually, by installing all packages one by one, or automatically by following the instruction provided below.
+If Anaconda is already installed on your system, a virtual environment for `FIERCE` can be set either manually, by installing all packages one by one, or automatically by following the instructions provided below.
 
 If you are not working on a Linux machine, all required packages must be manually installed on your R and Python.
 
-#### Create a `FIERCE` environment and install all anaconda available packages automatically
+#### Create a `FIERCE` environment and install all available anaconda packages automatically
 
 On a Linux system, a working Anaconda environment for `FIERCE` can be set exploiting two different strategies:
 
@@ -59,11 +59,12 @@ or
   conda create --name FIERCE -c conda-forge r-base=4.0.5 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3. 6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=3.11.0 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
   ```
 
-  Once you created the environment with the method of your choice, it can be accessed through the command:
 
-  ```bash
-  conda activate FIERCE
-  ```
+Once the environment has been created with the method of your choice, it can be accessed through the command:
+
+```bash
+conda activate FIERCE
+```
 
 and the last dependencies must be installed as explained below.
 
@@ -81,7 +82,7 @@ Since not all required R packages are provided by anaconda.org, some packages mu
 
 #### Install packages in R
 
-Thus, before installing `FIERCE`, users must open their R console and run the following code to install package's dependencies, which are deployed by CRAN, Bioconductor and Github.
+Before installing `FIERCE`, users must open their R console and run the following code to install the dependencies that are provided by CRAN, Bioconductor and Github.
 
 ```r
 CRANdep <- c("spatstat.core","ranger","pbkrtest","Seurat", "SeuratObject", "BiocManager")
@@ -108,13 +109,13 @@ if(!"SCENT"%in% installed.packages()[,"Package"]){devtools::install_github("aet2
 
 ```
 
-Once all dependencies have been installed, `FIERCE` can be installed with the following script:
+Once all dependencies have been installed, `FIERCE` can be installed with the following command:
 
 ```r
 devtools::install_github("bicciatolab/FIERCE")
 ```
 
-In case of any issue with `FIERCE` installation through `install_github`, it is possible to download the package.tar.gz and install `FIERCE` from a local repository using the following script:
+In case of any issue with `FIERCE` installation through `install_github`, it is possible to download the package.tar.gz and install `FIERCE` from a local repository using the following command:
 
 ```r
 install.packages("/path/to/package_directory", repos = NULL, type="source")
