@@ -25,9 +25,9 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 
 ## Installation
 
-To install `FIERCE` package, especially if working on a Linux machine, we strongly recommend the use of a virtual Anaconda environment to avoid conflicts between package's dependencies versions.
+To install `FIERCE` package, especially if working on a Linux machine, we strongly recommend the use of an Anaconda virtual environment to avoid conflicts between package's dependencies versions.
 
-If Anaconda is already installed on your system, a virtual environment for `FIERCE` can be set either manually, installing all packages one by one, or automatically following the instruction provided below.
+If Anaconda is already installed on your system, a virtual environment for `FIERCE` can be set either manually, by installing all packages one by one, or automatically by following the instruction provided below.
 
 If you are not working on a Linux machine, all required packages must be manually installed on your R and Python.
 
@@ -35,9 +35,9 @@ If you are not working on a Linux machine, all required packages must be manuall
 
 On a Linux system, a working Anaconda environment for `FIERCE` can be set exploiting two different strategies:
 
-1- Generating the `FIERCE` environment from a .yml file
+1- Creating the `FIERCE` environment from a .yml file
 
-   According to this installation procedure, a provided pre-configured working environment can be downloaded from your terminal using the command
+   According to this installation procedure, a pre-configured working environment can be downloaded on your terminal using the command
 
   ```bash
   wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE.yml
@@ -59,17 +59,17 @@ or
   conda create --name FIERCE -c conda-forge r-base=4.0.5 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3. 6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=3.11.0 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
   ```
 
-  Whatever the strategy applied, once created the environment, it may be accessed through the command:
+  Once you created the environment with the method of your choice, it can be accessed through the command:
 
   ```bash
   conda activate FIERCE
   ```
 
-and the last dependencies must be installed as explained below
+and the last dependencies must be installed as explained below.
 
 #### Install Python packages
 
-Attached the environment use the following lines of code on your terminal to install the remaining mandatory python packages:
+Once attached the environment, use the following lines of code on your terminal to install the remaining mandatory python packages:
 
 ```python
 python -m pip install cython
@@ -77,11 +77,11 @@ python -m pip install cython
 pip3 install velocyto==0.17.17 scvelo scikit-learn
 ```
 
-Since not all required R packages are provided by anaconda.org, some packages must be directly installed from the console, as described in [install packages in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r).
+Since not all required R packages are provided by anaconda.org, some packages must be directly installed on the console, as described in [install packages in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r).
 
 #### Install packages in R
 
-Thus, before installing `FIERCE`, users must open their R console and run the following code to install package's dependencies, which are deployed by CRAN, Bioconductor, and Github.
+Thus, before installing `FIERCE`, users must open their R console and run the following code to install package's dependencies, which are deployed by CRAN, Bioconductor and Github.
 
 ```r
 CRANdep <- c("spatstat.core","ranger","pbkrtest","Seurat", "SeuratObject", "BiocManager")
@@ -122,13 +122,13 @@ install.packages("/path/to/package_directory", repos = NULL, type="source")
 
 #### Automatic installation
 
-More bravely, `FIERCE` can be automatically installed downloading its installation file by
+Alternatively, `FIERCE` can be automatically installed by downloading its installation file with
 
 ```bash
 wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE_istallation.sh
 ```
 
-and running it with
+then run the downloaded file with
 
 ```bash
 sh /path/to/Installation/file/FIERCE_istallation.sh
