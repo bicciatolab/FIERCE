@@ -461,6 +461,9 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
   #HVGs
 
   if (find_HVGs==TRUE) {
+    if (check_uns(adata,"log1p")=="Yes") {
+      log1p_correction(adata)
+    }
     if (!is.null(n_top_HVGs)) {
       n_top_HVGs <- as.integer(n_top_HVGs)
     }

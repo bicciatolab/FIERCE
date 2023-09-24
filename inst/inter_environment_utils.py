@@ -167,6 +167,11 @@ def key_in_shelf(my_shelf, key):
 		return "no"
 
 
+def log1p_correction(adata):
+	adata.uns['log1p'] = {'base': None}
+	return None
+
+
 def plot_multiple_scatters(adata, embedding_basis, genes, layer, legend_loc, filename, color_map):
 	pp = PdfPages(filename)
 	for gene in genes:
