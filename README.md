@@ -56,7 +56,7 @@ or
   Hence, to install the environment open your terminal and run:
 
   ```bash
-  conda create --name FIERCE -c conda-forge r-base=4.0.5 python=3.10.6 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3. 6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=3.11.0 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
+  conda create --name FIERCE -c conda-forge r-base=4.0.5 python=3.10.6 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3.6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=0.5_9 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
   ```
 
 
@@ -114,6 +114,8 @@ Once all dependencies have been installed, `FIERCE` can be installed with the fo
 ```r
 devtools::install_github("bicciatolab/FIERCE")
 ```
+
+Finally, exit your R session and restart it to avoid conflicts during the packages loading (in particular, rlang). 
 
 In case of any issue with `FIERCE` installation through `install_github`, it is possible to download the package.tar.gz and install `FIERCE` from a local repository using the following command:
 
