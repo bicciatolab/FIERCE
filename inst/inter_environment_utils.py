@@ -184,7 +184,7 @@ def pca_heatmap(adata, components, use_raw=None, layer=None, filename="pca_heatm
 	adata.obs['fake'] = np.repeat('fake', adata.shape[0]).tolist()
 	attr = 'varm'
 	keys = 'PCs'
-	components = list(range(components))
+	components = list(range(components)) 
 	pp = PdfPages(filename)
 	for component in components:
 		scores = getattr(adata, attr)[keys][:, component]
@@ -194,11 +194,16 @@ def pca_heatmap(adata, components, use_raw=None, layer=None, filename="pca_heatm
 		pd2 = pd.DataFrame(adata.obsm['X_pca'][:, component], index=adata.obs.index)
 		bottom_cells = pd2.sort_values(0).index[:300].tolist()
 		top_cells = pd2.sort_values(0, ascending=False).index[:300].tolist()
+#		ax = plt.subplot()
+		plt.rcParams.update({'font.size' : 8})
 		sc.pl.heatmap(
 			adata[top_cells+bottom_cells], list(var_names_pos) + list(var_names_neg),
 			show_gene_labels=True,
 			swap_axes=True, cmap='viridis',
 			use_raw=False, layer=layer, figsize=(3, 3), groupby='fake')
+#		for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+#    		label.set_fontproperties(font_prop)
+#			label.set_fontsize(8) # Size here overrides font_prop
 		plt.title('PC_' + str(component+1))
 		plt.savefig(pp, format='pdf', bbox_inches='tight')
 	pp.close()

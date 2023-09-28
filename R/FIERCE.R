@@ -134,14 +134,18 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 
     for (i in 1:length(loom_file)) {
 
-    	print(paste0("Parsing ", loom_file[i]))
+    	cat(paste0("Parsing ", loom_file[i]))
+      cat("\n")
 
 		  adata_object_i <- anndata$read_loom(loom_file[i])
       adata_object_i$var_names_make_unique()
 
     	if (!is.null(cells_to_keep)) {
     		cells <- adata_object_i$obs_names$tolist()[adata_object_i$obs_names$tolist()%in%cells_to_keep]
-        if (length(cells)==0) {print(paste0("Skipping ", loom_file[i]))}
+        if (length(cells)==0) {
+          cat(paste0("Skipping ", loom_file[i]))
+          cat("\n")
+        }
         if (length(cells)==0) next
         adata_object_i <- subset_anndata_cells(adata_object_i, cells)
     	}
@@ -404,9 +408,13 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     }
 
     sc$pp$calculate_qc_metrics(adata, qc_vars=qc_vars, percent_top=NULL, log1p=FALSE, inplace=TRUE)
-    #solve the MT problem
+
+#    prova <- file("log.txt", open = "a")
+#    sink(prova, type = "message")
 
     sc$pl$violin(adata, vars_to_plot, jitter=as.numeric(0.4), multi_panel=TRUE, scale='count', save='_QC_metrics.pdf')
+
+#    sink()
 
     if (compute_MT_fraction==TRUE) {
       sc$pl$scatter(adata, x='total_counts', y='pct_counts_mt', save='_UMI_MTf.pdf')
@@ -415,6 +423,8 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     } else {
       sc$pl$scatter(adata, x='total_counts', y='n_genes_by_counts', save='_UMI_Gene.pdf')
     }
+
+#    sink()
   }
 
   #Advanced filtering
@@ -452,7 +462,8 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
   if (cell_cycle_scoring==TRUE) {
     if (is.null(s_genes) | is.null(g2m_genes)) {
       cell_cycle_scoring <- FALSE
-      print("WARNING: No lists provided for cell cycle genes - skipping cell cycle scoring")
+      cat("WARNING: No lists provided for cell cycle genes - skipping cell cycle scoring")
+      cat("\n")
     } else {
       sc$tl$score_genes_cell_cycle(adata, s_genes=s_genes, g2m_genes=g2m_genes)
     }
@@ -639,7 +650,8 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
         sc$tl$rank_genes_groups(adata, groupby=groups_for_DEGs, method=method_for_DEGs, use_raw=FALSE)
         sc$pl$rank_genes_groups(adata, n_genes=as.integer(DEGs_to_show), sharey=FALSE, save='.pdf')
       } else {
-        print("WARNING: DEGs computation skipped - no groups defined")
+        cat("WARNING: DEGs computation skipped - no groups defined")
+        cat("\n")
       }
     } else {
       sc$tl$rank_genes_groups(adata, groupby=groups_for_DEGs, method=method_for_DEGs, use_raw=FALSE)
@@ -682,6 +694,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #' @param n_neighbors number of nearest neighbors to compute for each cell in the nearest neighbor graph (necessary for first order moments computation, skipped if use_raw=TRUE, or if the graph is already present). Default is 30 neighbors
 #' @param mode_moments method for first order moments computation. Choose between "distances" or "connectivities". Default is "connectivities"
 #' @param use_raw boolean; whether to use normalized counts for velocity computation instead of first order moments. Default is FALSE
+#' @param n_cores number of cores to use for dynamical model fitting. If NULL (default), only 1 will be used
 #' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
 #'
 #' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, velocities, first order moments (both spliced and unspliced) and future spliced transcriptional states will be saved as additional layers
@@ -705,7 +718,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #' @export
 #'
 
-compute_velocity <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, adata_copy=TRUE) {
+compute_velocity <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=TRUE) {
   scv <- import("scvelo")
   if (adata_copy==TRUE) {
     adata = adata$copy()
@@ -726,7 +739,7 @@ compute_velocity <- function (adata, min_counts=NULL, min_cells=NULL, max_counts
 
   scv$pp$moments(adata, n_pcs=as.integer(n_pcs), n_neighbors=as.integer(n_neighbors), mode=mode_moments)
 
-  scv$tl$recover_dynamics(adata, use_raw=use_raw)
+  scv$tl$recover_dynamics(adata, use_raw=use_raw, n_jobs=as.integer(n_cores))
   scv$tl$velocity(adata, mode='dynamical', use_raw=use_raw)
 
   if (use_raw==FALSE) {
@@ -925,7 +938,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 
   if (check_layers(adata, "SCENT_input_matrix_observed")=="No") {
 
-    print("Creating input matrix from observed transcriptional states...")
+    cat("Creating input matrix from observed transcriptional states...")
+    cat("\n")
 
     if (use_raw==FALSE) {
       input_matrix_obs <- adata$layers['Ms']
@@ -946,12 +960,14 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     add_layer(adata, input_matrix_obs, "SCENT_input_matrix_observed", transpose=TRUE, compress=FALSE)
 
   } else {
-    print("Observed input matrix already computed")
+    cat("Observed input matrix already computed")
+    cat("\n")
   }
 
   if (check_layers(adata, "SCENT_input_matrix_future")=="No") {
 
-    print("Creating input matrix from future transcriptional states...")
+    cat("Creating input matrix from future transcriptional states...")
+    cat("\n")
 
     if (use_raw==FALSE) {
       input_matrix_fut <- adata$layers['Ms_future']
@@ -972,11 +988,13 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     add_layer(adata, input_matrix_fut, "SCENT_input_matrix_future", transpose=TRUE, compress=FALSE)
 
   } else {
-    print("Future input matrix already computed")
+    cat("Future input matrix already computed")
+    cat("\n")
   }
 
   # Load PPI network
-  print("Loading PPI network...")
+  cat("Loading PPI network...")
+  cat("\n")
   if (use_original_SCENT_network == TRUE) {
     if (most_recent_network == TRUE) {
       data(net17Jan16)
@@ -1062,7 +1080,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   ####################
 
   if (check_layers(adata, "SCENT_integrated_matrix_observed")=="No") {
-  print("Integrating observed input matrix with PPI network...")
+  cat("Integrating observed input matrix with PPI network...")
+  cat("\n")
   if (!exists("input_matrix_obs")) {
     input_matrix_obs <- t(adata$layers['SCENT_input_matrix_observed'])
     rownames(input_matrix_obs) <- adata$var_names$tolist()
@@ -1075,14 +1094,17 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print(paste0(as.character(length(rownames(integ.l.obs$expMC))), " genes remaining after integration of observed input matrix with PPI network"))
+  cat(paste0(as.character(length(rownames(integ.l.obs$expMC))), " genes remaining after integration of observed input matrix with PPI network"))
+  cat("\n")
   } else {
-    print("Integrated observed matrix already computed")
+    cat("Integrated observed matrix already computed")
+    cat("\n")
   }
 
   if (!("total_entropies_observed" %in% names(adata$obs))) {
   # compute the entropy
-  print("Computing observed entropies (this could take a while)...")
+  cat("Computing observed entropies (this could take a while)...")
+  cat("\n")
   if (!exists("integ.l.obs")) {
     expMC <- t(adata$layers['SCENT_integrated_matrix_observed'])
     rownames(expMC) <- adata$var_names$tolist()
@@ -1101,17 +1123,22 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print("Done!")
+  cat("Done!")
+  cat("\n")
   } else {
   sequence <- c(seq(0, length(adata$obs_names$tolist()), by=batch_size), length(adata$obs_names$tolist()))
   for (i in 2:length(sequence)) {
     if (key_in_shelf(shelf, "partial_entropies_observed")=="yes") {
       if (ncol(shelf['partial_entropies_observed'])>=sequence[i]) next
     }
-    print(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
+    cat(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
+    cat("\n")
     integ.l.obs.i <- integ.l.obs
     integ.l.obs.i$expMC <- integ.l.obs.i$expMC[,(sequence[i-1]+1):sequence[i]]
     sr.o.obs <- CompSRana(integ.l.obs.i, local = TRUE, mc.cores = n_cores)
+    if (is.null(ncol(sr.o.obs$nlocS))) {
+      stop("SCENT algorithm has run out of memory, please re-launch the command with less cores")
+    }
     if (key_in_shelf(shelf, "partial_entropies_observed")=="yes") {
       add_shelves(shelf, "total_entropies_observed", c(shelf['total_entropies_observed'], sr.o.obs$SR))
       add_shelves(shelf, "invariant_measure_observed", cbind(shelf['invariant_measure_observed'], sr.o.obs$inv))
@@ -1132,15 +1159,18 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print("Done!")
+  cat("Done!")
+  cat("\n")
   }
   } else {
-    print("Observed signaling entropies already computed")
+    cat("Observed signaling entropies already computed")
+    cat("\n")
   }
 
   ##Inference of potency states in the population ####
   if ((compute_potency_states==TRUE) & !("Potency_states_observed" %in% names(adata$obs))) {
-    print("Computing observed potency states...")
+    cat("Computing observed potency states...")
+    cat("\n")
     sr.v<-adata$obs['total_entropies_observed'][,'total_entropies_observed']
     if (is.null(phenotype_annotation)) {
       stop("Missing phenotypes for potency states computation")
@@ -1154,7 +1184,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
       assign(h, adata, envir=.GlobalEnv)
     }
   } else {
-    print("Observed potency states already computed")
+    cat("Observed potency states already computed")
+    cat("\n")
   }
 
   ##################
@@ -1162,7 +1193,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   ##################
 
   if (check_layers(adata, "SCENT_integrated_matrix_future")=="No") {
-  print("Integrating future input matrix with PPI network...")
+  cat("Integrating future input matrix with PPI network...")
+  cat("\n")
   if (!exists("input_matrix_fut")) {
     input_matrix_fut <- t(adata$layers['SCENT_input_matrix_future'])
     rownames(input_matrix_fut) <- adata$var_names$tolist()
@@ -1174,14 +1206,17 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print(paste0(as.character(length(rownames(integ.l.obs$expMC))), " genes remaining after integration of future input matrix with PPI network"))
+  cat(paste0(as.character(length(rownames(integ.l.obs$expMC))), " genes remaining after integration of future input matrix with PPI network"))
+  cat("\n")
   } else {
-    print("Integrated future matrix already computed")
+    cat("Integrated future matrix already computed")
+    cat("\n")
   }
 
   if (!("total_entropies_future" %in% names(adata$obs))) {
   # compute the entropy
-  print("Computing future entropies (this could take a while)...")
+  cat("Computing future entropies (this could take a while)...")
+  cat("\n")
   if (!exists("integ.l.fut")) {
     expMC <- t(adata$layers['SCENT_integrated_matrix_future'])
     rownames(expMC) <- adata$var_names$tolist()
@@ -1200,17 +1235,22 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print("Done!")
+  cat("Done!")
+  cat("\n")
   } else {
   sequence <- c(seq(0, length(adata$obs_names$tolist()), by=batch_size), length(adata$obs_names$tolist()))
   for (i in 2:length(sequence)) {
     if (key_in_shelf(shelf, "partial_entropies_future")=="yes") {
       if (ncol(shelf['partial_entropies_future'])>=sequence[i]) next
     }
-    print(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
+    cat(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
+    cat("\n")
     integ.l.fut.i <- integ.l.fut
     integ.l.fut.i$expMC <- integ.l.fut.i$expMC[,(sequence[i-1]+1):sequence[i]]
     sr.o.fut <- CompSRana(integ.l.fut.i, local = TRUE, mc.cores = n_cores)
+    if (is.null(ncol(sr.o.fut$nlocS))) {
+      stop("SCENT algorithm has run out of memory, please re-launch the command with less cores")
+    }
     if (key_in_shelf(shelf, "partial_entropies_future")=="yes") {
       add_shelves(shelf, "total_entropies_future", c(shelf['total_entropies_future'], sr.o.fut$SR))
       add_shelves(shelf, "invariant_measure_future", cbind(shelf['invariant_measure_future'], sr.o.fut$inv))
@@ -1231,15 +1271,18 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print("Done!")
+  cat("Done!")
+  cat("\n")
   }
   } else {
-    print("Future signaling entropies already computed")
+    cat("Future signaling entropies already computed")
+    cat("\n")
   }
 
   ##Inference of potency states in the population ####
   if ((compute_potency_states==TRUE) & !("Potency_states_future" %in% names(adata$obs))) {
-    print("Computing future potency states...")
+    cat("Computing future potency states...")
+    cat("\n")
     sr.v<-adata$obs['total_entropies_future'][,'total_entropies_future']
     if (is.null(phenotype_annotation)) {
       stop("Missing phenotypes for potency states computation")
@@ -1253,7 +1296,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
       assign(h, adata, envir=.GlobalEnv)
     }
   } else {
-    print("Future potency states already computed")
+    cat("Future potency states already computed")
+    cat("\n")
   }
 
   #################################
@@ -1261,15 +1305,18 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   #################################
 
   if (check_layers(adata, "velocity_of_the_entropy")=="No") {
-  print("Computing velocity of the entropy...")
+  cat("Computing velocity of the entropy...")
+  cat("\n")
   velent <- adata$layers['partial_entropies_future'] - adata$layers['partial_entropies_observed']
   add_layer(adata, velent, "velocity_of_the_entropy", transpose=FALSE, compress=FALSE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
-  print("Done!")
+  cat("Done!")
+  cat("\n")
   } else {
-    print("Velocity of the entropy already computed")
+    cat("Velocity of the entropy already computed")
+    cat("\n")
   }
 
   } else if (potency_states_only_mode=="on") {
@@ -1277,21 +1324,25 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if (!("total_entropies_observed" %in% names(adata$obs))) {
     stop("No pre-computed entropy scores in anndata object")
   }
-  print("Computing observed potency states...")
+  cat("Computing observed potency states...")
+  cat("\n")
   sr.v<-adata$obs['total_entropies_observed'][,'total_entropies_observed']
   if (is.null(phenotype_annotation)) {
     stop("Missing phenotypes for potency states computation")
   }
   pot.o.obs <- InferPotencyStates(potest.v=sr.v, pheno.v = adata$obs[phenotype_annotation][,phenotype_annotation])
-  print("Done!")
+  cat("Done!")
+  cat("\n")
 
-  print("Computing future potency states...")
+  cat("Computing future potency states...")
+  cat("\n")
   sr.v<-adata$obs['total_entropies_future'][,'total_entropies_future']
   if (is.null(phenotype_annotation)) {
     stop("Missing phenotypes for potency states computation")
   }
   pot.o.fut <- InferPotencyStates(potest.v=sr.v, pheno.v = adata$obs[phenotype_annotation][,phenotype_annotation])
-  print("Done!")
+  cat("Done!")
+  cat("\n")
 
   add_annotation_obs(adata, as.character(pot.o.obs$potS), "Potency_states_observed")
   add_annotation_obs(adata, as.character(pot.o.fut$potS), "Potency_states_future")
@@ -1413,7 +1464,8 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
 
   # boxplot of SR values VS phenotypic labels of interest
-  print("Boxplot entropy vs phenotype labels...")
+  cat("Boxplot entropy vs phenotype labels...")
+  cat("\n")
   sr.v.obs <- adata$obs['total_entropies_observed'][,'total_entropies_observed']
   sr.v.fut <- adata$obs['total_entropies_future'][,'total_entropies_future']
 
@@ -1438,25 +1490,32 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
   dev.off()
 
-  print("ANOVA observed entropies vs phenotype labels...")
+  cat("ANOVA observed entropies vs phenotype labels...")
+  cat("\n")
   for (i in 1:length(pheno.v)) {
-    print(phenotype_annotation[i])
+    cat(phenotype_annotation[i])
+    cat("\n")
     df_i <- data.frame(observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
-    print(summary(aov(observed_entropies ~ phenotypes, data=df_i)))
+    cat(summary(aov(observed_entropies ~ phenotypes, data=df_i)))
+    cat("\n")
   }
 
-  print("ANOVA future entropies vs phenotype labels...")
+  cat("ANOVA future entropies vs phenotype labels...")
+  cat("\n")
   for (i in 1:length(pheno.v)) {
-    print(phenotype_annotation[i])
+    cat(phenotype_annotation[i])
+    cat("\n")
     df_i <- data.frame(future_entropies=sr.v.fut, phenotypes=pheno.v[[i]])
-    print(summary(aov(future_entropies ~ phenotypes, data=df_i)))
+    cat(summary(aov(future_entropies ~ phenotypes, data=df_i)))
+    cat("\n")
   }
 
   # boxplot of expressed genes (ONLY genes used by SCENT) VS phenotypic labels of interest
   expression_matrix <- t(as.matrix(adata$X$todense()))
   expr.v <- apply(expression_matrix, 2, function(x) sum(x>0)) #count all genes with expr > 0 per cell
 
-  print("Boxplot expressed genes vs phenotype labels...")
+  cat("Boxplot expressed genes vs phenotype labels...")
+  cat("\n")
   pdf("Boxplot_expressed_genes_per_phenotype.pdf", useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(expressed_genes=expr.v, phenotypes=pheno.v[[i]])
@@ -1472,7 +1531,8 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 
   # boxplot with the mean expression computed on expressed genes for each cell
   mean.expr.v<-apply(expression_matrix, 2, function(x) mean(x[x>0]))
-  print("Boxplot mean expression vs phenotype labels...")
+  cat("Boxplot mean expression vs phenotype labels...")
+  cat("\n")
   pdf("Boxplot_mean_expression_per_phenotype.pdf", useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(mean_expression=mean.expr.v, phenotypes=pheno.v[[i]])
@@ -1488,7 +1548,8 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 
   # boxplot with the median expression computed on expressed genes for each cell
   median.expr.v<-apply(expression_matrix, 2, function(x) median(x[x>0]))
-  print("Boxplot median expression vs phenotype labels...")
+  cat("Boxplot median expression vs phenotype labels...")
+  cat("\n")
   pdf("Boxplot_median_expression_per_phenotype.pdf", useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(median_expression=median.expr.v, phenotypes=pheno.v[[i]])
@@ -1503,7 +1564,8 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   dev.off()
 
   # scatterplot of expressed genes VS SR value
-  print("Scatterplot expressed genes vs SR...")
+  cat("Scatterplot expressed genes vs SR...")
+  cat("\n")
   pdf("Scatterplot_expressed_genes_SR.pdf", useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(expressed_genes=expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
@@ -1525,7 +1587,8 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
   dev.off()
 
-  print("Scatterplot mean expression vs SR...")
+  cat("Scatterplot mean expression vs SR...")
+  cat("\n")
   pdf("Scatterplot_mean_expression_SR.pdf", useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(mean_expression=mean.expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
@@ -1547,7 +1610,8 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
   dev.off()
 
-  print("Scatterplot median expression vs SR...")
+  cat("Scatterplot median expression vs SR...")
+  cat("\n")
   pdf("Scatterplot_median_expression_SR.pdf", useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(median_expression=median.expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
@@ -1569,21 +1633,29 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
   dev.off()
 
-  print("Computing correlations...")
+  cat("Computing correlations...")
+  cat("\n")
 
   # compute the correlation between SR score and expressed genes
-  print(paste0("Correlation between observed SR score and number of expressed genes: ", as.character(cor(sr.v.obs, expr.v))))
-  print(paste0("Correlation between future SR score and number of expressed genes: ", as.character(cor(sr.v.fut, expr.v))))
+  cat(paste0("Correlation between observed SR score and number of expressed genes: ", as.character(cor(sr.v.obs, expr.v))))
+  cat("\n")
+  cat(paste0("Correlation between future SR score and number of expressed genes: ", as.character(cor(sr.v.fut, expr.v))))
+  cat("\n")
   # compute the correlation between SR score and mean of expressed genes
-  print(paste0("Correlation between observed SR score and mean expression: ", as.character(cor(sr.v.obs, mean.expr.v))))
-  print(paste0("Correlation between future SR score and mean expression: ", as.character(cor(sr.v.fut, mean.expr.v))))
+  cat(paste0("Correlation between observed SR score and mean expression: ", as.character(cor(sr.v.obs, mean.expr.v))))
+  cat("\n")
+  cat(paste0("Correlation between future SR score and mean expression: ", as.character(cor(sr.v.fut, mean.expr.v))))
+  cat("\n")
   # compute the correlation between SR score and median of expressed genes
-  print(paste0("Correlation between observed SR score and median expression: ", as.character(cor(sr.v.obs, median.expr.v))))
-  print(paste0("Correlation between future SR score and median expression: ", as.character(cor(sr.v.fut, median.expr.v))))
+  cat(paste0("Correlation between observed SR score and median expression: ", as.character(cor(sr.v.obs, median.expr.v))))
+  cat("\n")
+  cat(paste0("Correlation between future SR score and median expression: ", as.character(cor(sr.v.fut, median.expr.v))))
+  cat("\n")
 
   ## DOTPLOT ####
   if ("Potency_states_observed" %in% names(adata$obs)) {
-    print("Dotplot of potency states...")
+    cat("Dotplot of potency states...")
+    cat("\n")
     library(ggplot2)
     library(reshape2)
     library(scales)
@@ -1711,7 +1783,8 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   colnames(entropies_matrix) <- adata$var_names$tolist()
   adata_temp <- ad$AnnData(entropies_matrix)
 
-  print("Performing PCA on local entropies...")
+  cat("Performing PCA on local entropies...")
+  cat("\n")
 
   sc$tl$pca(adata_temp, svd_solver='arpack')
 
@@ -1729,7 +1802,8 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
   }
 
-  print("Plotting PCs...")
+  cat("Plotting PCs...")
+  cat("\n")
 
   if (is.null(color_as)) {
     if (!("pca_entropy.pdf"%in%dir())) {
@@ -1777,7 +1851,8 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
     n_pcs <- ncol(adata_temp$obsm['X_pca'])
   }
 
-  print("Performing UMAP...")
+  cat("Performing UMAP...")
+  cat("\n")
 
   entropies_matrix <- adata$layers['partial_entropies_observed']
   rownames(entropies_matrix) <- adata$obs_names$tolist()
@@ -1820,7 +1895,8 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
   rm(adata_temp)
 
-  print("Plotting UMAP results...")
+  cat("Plotting UMAP results...")
+  cat("\n")
 
   for (j in n_neighbors) {
 
