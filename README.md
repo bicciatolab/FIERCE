@@ -17,8 +17,8 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 
 ## System requirements
 
-* Operating System: Linux
-* Distro: Ubuntu >= 18.04.5 LTS
+* Operating System: *Linux*
+* Distro: *Ubuntu* >= 18.04.5 LTS
 
 * R version: >= 4.0.5
 * Dependencies: *reticulate*, *SCENT*, *Seurat*, *SeuratObject*, *ggplot2*, *reshape2*, *scales*, *usethis*, *tools*, *usethis*.
