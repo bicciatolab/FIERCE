@@ -17,6 +17,9 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 
 ## System requirements
 
+* Operating System: Linux
+* Distro: Ubuntu >= 18.04.5 LTS
+
 * R version: >= 4.0.5
 * Dependencies: *reticulate*, *SCENT*, *Seurat*, *SeuratObject*, *ggplot2*, *reshape2*, *scales*, *usethis*, *tools*, *usethis*.
 
@@ -25,11 +28,11 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 
 ## Installation
 
-To install `FIERCE` package, especially if working on a Linux machine, we strongly recommend the use of an Anaconda virtual environment to avoid conflicts between the versions of dependencies.
+The `FIERCE` package is developed and provided for Linux machines, to make it work the use of an Anaconda virtual environment is strongly recommended to avoid conflicts between the versions of dependencies.
 
 If Anaconda is already installed on your system, a virtual environment for `FIERCE` can be set either manually, by installing all packages one by one, or automatically by following the instructions provided below.
 
-If you are not working on a Linux machine, all required packages must be manually installed on your R and Python.
+If you are not working on a Linux machine, all required packages must be manually installed on your R and Python (alternatively, it is provided a .yml file also for MacOS users, downloadable [here](https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE_for_MacOS.yml); and a working environment can be set following the same installation instructions). Warning: This latter procedure is not trivial and requires an accurate setting of compilers.
 
 #### Create a `FIERCE` environment and install all available anaconda packages automatically
 
