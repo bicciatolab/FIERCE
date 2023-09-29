@@ -1,5 +1,5 @@
-CRANdep <- c("spatstat.core","ranger","pbkrtest","Seurat", "SeuratObject", "BiocManager")
-versions <- c("2.4-4","0.14.1","0.5.1","4.2.0","4.1.2","1.30.19")
+CRANdep <- c("ranger","pbkrtest","BiocManager")
+versions <- c("0.14.1","0.5.1","1.30.19")
 for (i in 1:length(CRANdep)) {
   if (!(CRANdep[i] %in% installed.packages()[,"Package"]) | !(versions[i] %in% installed.packages()[installed.packages()[,"Package"]==CRANdep[i],"Version"])) {
       devtools::install_version(CRANdep[i], version = versions[i], repos = "https://cloud.r-project.org")

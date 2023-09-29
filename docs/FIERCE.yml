@@ -13,18 +13,21 @@ dependencies:
   - binutils_impl_linux-64=2.39=h6ceecb4_0
   - brotli=1.0.9=h166bdaf_8
   - brotli-bin=1.0.9=h166bdaf_8
+  - brotlipy=0.7.0=py310h5764c6d_1005
   - bwidget=1.9.14=ha770c72_1
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2022.9.24=ha878542_0
+  - ca-certificates=2023.7.22=hbcca054_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cairo=1.16.0=ha61ee94_1014
-  - certifi=2022.9.24=pyhd8ed1ab_0
+  - certifi=2023.7.22=pyhd8ed1ab_0
+  - cffi=1.15.1=py310h255011f_3
   - charset-normalizer=2.1.1=pyhd8ed1ab_0
   - colorama=0.4.6=pyhd8ed1ab_0
   - curl=7.86.0=h2283fc2_1
   - cycler=0.11.0=pyhd8ed1ab_0
+  - docutils=0.19=py310hff52083_1
   - expat=2.5.0=h27087fc_0
   - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
   - font-ttf-inconsolata=3.000=h77eed37_0
@@ -48,6 +51,7 @@ dependencies:
   - hdf5=1.12.2=nompi_h4df4325_100
   - icu=70.1=h27087fc_0
   - idna=3.4=pyhd8ed1ab_0
+  - igraph=0.10.3=hb9ddf80_0
   - imagesize=1.4.1=pyhd8ed1ab_0
   - importlib-metadata=5.0.0=pyha770c72_1
   - importlib_metadata=5.0.0=hd8ed1ab_1
@@ -59,6 +63,7 @@ dependencies:
   - krb5=1.19.3=h08a2579_0
   - lcms2=2.14=h6ed2654_0
   - ld_impl_linux-64=2.39=hc81fddc_0
+  - leidenalg=0.9.1=py310heca2aa9_0
   - lerc=4.0.0=h27087fc_0
   - libblas=3.9.0=16_linux64_openblas
   - libbrotlicommon=1.0.9=h166bdaf_8
@@ -80,6 +85,7 @@ dependencies:
   - libiconv=1.17=h166bdaf_0
   - liblapack=3.9.0=16_linux64_openblas
   - libllvm11=11.1.0=he0ac6c6_5
+  - libllvm14=14.0.6=hcd5def8_4
   - libnghttp2=1.47.0=hff17c54_1
   - libnsl=2.0.0=h7f98852_0
   - libopenblas=0.3.21=pthreads_h78a6416_3
@@ -104,24 +110,29 @@ dependencies:
   - ncurses=6.3=h27087fc_1
   - networkx=2.8.8=pyhd8ed1ab_0
   - openjpeg=2.5.0=h7d73246_1
-  - openssl=3.0.7=h0b41bf4_1
+  - openssl=3.1.3=hd590300_0
   - packaging=21.3=pyhd8ed1ab_0
   - pandoc=2.19.2=h32600fe_1
   - pango=1.50.11=h382ae3d_0
   - patsy=0.5.3=pyhd8ed1ab_0
   - pcre2=10.37=hc3806b6_1
+  - pillow=9.2.0=py310h454ad03_3
   - pip=22.3=pyhd8ed1ab_0
   - pixman=0.40.0=h36c2ea0_0
+  - platformdirs=3.1.1=pyhd8ed1ab_0
+  - pooch=1.7.0=pyha770c72_3
   - pthread-stubs=0.4=h36c2ea0_1001
   - pycparser=2.21=pyhd8ed1ab_0
   - pygments=2.13.0=pyhd8ed1ab_0
   - pynndescent=0.5.8=pyh1a96a4e_0
   - pyopenssl=22.1.0=pyhd8ed1ab_0
   - pyparsing=3.0.9=pyhd8ed1ab_0
+  - pysocks=1.7.1=pyha2e5f31_6
   - python=3.10.6=ha86cf86_0_cpython
   - python-dateutil=2.8.2=pyhd8ed1ab_0
   - python-igraph=0.10.2=py310h18f4e01_1
   - python-louvain=0.15=pyhd8ed1ab_1
+  - python-tzdata=2023.3=pyhd8ed1ab_0
   - python_abi=3.10=2_cp310
   - pytz=2022.6=pyhd8ed1ab_0
   - r-askpass=1.1=r40hcfec24a_2
@@ -272,8 +283,10 @@ dependencies:
   - tk=8.6.12=h27826a3_0
   - tktable=2.10=hb7b940f_3
   - tqdm=4.64.1=pyhd8ed1ab_0
+  - typing-extensions=4.4.0=hd8ed1ab_0
   - typing_extensions=4.4.0=pyha770c72_0
   - tzdata=2022f=h191b570_0
+  - unicodedata2=15.0.0=py310h5764c6d_0
   - urllib3=1.26.11=pyhd8ed1ab_0
   - wheel=0.37.1=pyhd8ed1ab_0
   - xorg-kbproto=1.0.7=h7f98852_1002
@@ -293,52 +306,46 @@ dependencies:
   - zlib=1.2.13=h166bdaf_4
   - zstd=1.5.2=h6239696_4
   - pip:
-    - asttokens==2.4.0
-    - backcall==0.2.0
-    - brotlipy==0.7.0
-    - cffi==1.15.1
-    - click==8.1.3
-    - comm==0.1.4
-    - contourpy==1.0.6
-    - cryptography==38.0.3
-    - decorator==5.1.1
-    - docutils==0.19
-    - exceptiongroup==1.1.3
-    - executing==1.2.0
-    - fonttools==4.38.0
-    - h5py==3.7.0
-    - igraph==0.10.2
-    - ipython==8.15.0
-    - ipywidgets==8.1.1
-    - jedi==0.19.0
-    - jupyterlab-widgets==3.0.9
-    - kiwisolver==1.4.4
-    - llvmlite==0.39.1
-    - loompy==3.0.7
-    - markupsafe==2.1.1
-    - matplotlib==3.6.2
-    - matplotlib-inline==0.1.6
-    - numba==0.56.3
-    - numpy==1.23.4
-    - numpy-groupies==0.9.20
-    - pandas==1.5.1
-    - parso==0.8.3
-    - pexpect==4.8.0
-    - pickleshare==0.7.5
-    - pillow==9.2.0
-    - prompt-toolkit==3.0.39
-    - ptyprocess==0.7.0
-    - pure-eval==0.2.2
-    - pysam==0.20.0
-    - pysocks==1.7.1
-    - scikit-learn==1.1.3
-    - scipy==1.9.3
-    - scvelo==0.2.4
-    - stack-data==0.6.2
-    - statsmodels==0.13.5
-    - traitlets==5.10.0
-    - umap-learn==0.5.3
-    - unicodedata2==15.0.0
-    - wcwidth==0.2.6
-    - widgetsnbextension==4.0.9
-prefix: /data01/Programs/anaconda3/envs/FIERCE
+      - asttokens==2.4.0
+      - backcall==0.2.0
+      - click==8.1.3
+      - comm==0.1.4
+      - contourpy==1.0.6
+      - cryptography==38.0.3
+      - cython==3.0.2
+      - decorator==5.1.1
+      - exceptiongroup==1.1.3
+      - executing==1.2.0
+      - fonttools==4.38.0
+      - h5py==3.7.0
+      - ipython==8.15.0
+      - ipywidgets==8.1.1
+      - jedi==0.19.0
+      - jupyterlab-widgets==3.0.9
+      - kiwisolver==1.4.4
+      - llvmlite==0.39.1
+      - loompy==3.0.7
+      - markupsafe==2.1.1
+      - matplotlib-inline==0.1.6
+      - numba==0.56.3
+      - numpy==1.23.4
+      - numpy-groupies==0.9.20
+      - pandas==1.5.1
+      - parso==0.8.3
+      - pexpect==4.8.0
+      - pickleshare==0.7.5
+      - prompt-toolkit==3.0.39
+      - ptyprocess==0.7.0
+      - pure-eval==0.2.2
+      - pysam==0.20.0
+      - scikit-learn==1.1.3
+      - scipy==1.9.3
+      - scvelo==0.2.4
+      - stack-data==0.6.2
+      - statsmodels==0.13.5
+      - traitlets==5.10.0
+      - umap-learn==0.5.3
+      - velocyto==0.17.17
+      - wcwidth==0.2.6
+      - widgetsnbextension==4.0.9
+prefix: /home/luca/.conda/envs/FIERCE

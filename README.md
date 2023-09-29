@@ -28,11 +28,11 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 
 ## Installation
 
-The `FIERCE` package is developed and provided for Linux machines, to make it work the use of an Anaconda virtual environment is strongly recommended to avoid conflicts between the versions of dependencies.
+The `FIERCE` package is developed and provided for Linux machines. The use of an Anaconda virtual environment is strongly recommended to avoid conflicts between the versions of dependencies.
 
 If Anaconda is already installed on your system, a virtual environment for `FIERCE` can be set either manually, by installing all packages one by one, or automatically by following the instructions provided below.
 
-If you are not working on a Linux machine, all required packages must be manually installed on your R and Python (alternatively, it is provided a .yml file also for MacOS users, downloadable [here](https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE_for_MacOS.yml); and a working environment can be set following the same installation instructions). Warning: This latter procedure is not trivial and requires an accurate setting of compilers.
+If you are not working on a Linux machine, all required packages must be manually installed on your R and Python. For MacOS users, a dedicated .yml file is also provided [here](https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE_for_MacOS.yml), which can be used to install the `FIERCE` environment according to the procedure described below. Warning: This latter procedure is not trivial and requires an accurate setting of compilers.
 
 #### Create a `FIERCE` environment and install all available anaconda packages automatically
 
@@ -59,7 +59,7 @@ or
   Hence, to install the environment open your terminal and run:
 
   ```bash
-  conda create --name FIERCE -c conda-forge r-base=4.0.5 python=3.10.6 scanpy=1.9.1 python-louvain=0.15 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3.6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=0.5_9 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
+  conda create --name FIERCE -c conda-forge r-base=4.0.5 python=3.10.6 scanpy=1.9.1 python-louvain=0.15 leidenalg=0.9.1 tqdm=4.64.1 pandas=1.5.1 scipy=1.9.3 numba=0.56.3 matplotlib-base=3.6.2 h5py=3.7.0 click=8.1.3 r-ggplot2=3.3.6 r-reshape2=1.4.4 r-scales=1.2.1 anndata=0.8.0 r-rgeos=0.5_9 r-igraph=1.3.4 python-igraph=0.10.2 r-leiden=0.4.3 r-rcurl=1.98_1.8 r-devtools=2.4.4 r-reticulate=1.15
   ```
 
 
@@ -88,8 +88,8 @@ Since not all required R packages are provided by anaconda.org, some packages mu
 Before installing `FIERCE`, users must open their R console and run the following code to install the dependencies that are provided by CRAN, Bioconductor and Github.
 
 ```r
-CRANdep <- c("spatstat.core","ranger","pbkrtest","Seurat", "SeuratObject", "BiocManager")
-versions <- c("2.4-4","0.14.1","0.5.1","4.2.0","4.1.2","1.30.19")
+CRANdep <- c("ranger","pbkrtest","BiocManager")
+versions <- c("0.14.1","0.5.1","1.30.19")
 for (i in 1:length(CRANdep)) {
   if (!(CRANdep[i] %in% installed.packages()[,"Package"]) | !(versions[i] %in% installed.packages()[installed.packages()[,"Package"]==CRANdep[i],"Version"])) {
       devtools::install_version(CRANdep[i], version = versions[i], repos = "https://cloud.r-project.org")
