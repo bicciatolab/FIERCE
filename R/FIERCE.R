@@ -806,6 +806,11 @@ compute_velocity <- function (adata, min_counts=NULL, min_cells=NULL, max_counts
 
 plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", sqrt_transform=TRUE, embedding_basis='umap', force_graph_recalc=FALSE, compute_latent_time=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=TRUE) {
   scv <- import("scvelo")
+
+  if (check_layers(adata, "velocity")=="No") {
+    stop("RNA velocity has not been computed yet, please launch compute_velocity first")
+  }
+
   current_wd <- getwd()
   if (dir.exists(project_dir) == FALSE) {
     dir.create(project_dir)
