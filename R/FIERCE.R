@@ -130,6 +130,9 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
       stop("Neither loom file path nor adata object provided")
     }
 
+    cat("Generating anndata object from loom file(s)...")
+    cat("\n")
+
     c <- 0
 
     for (i in 1:length(loom_file)) {
@@ -186,6 +189,10 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
   #Optional integration with Seurat object
 
   if (!is.null(Seurat_object)) {
+
+    cat("Integrating with provided Seurat object...")
+    cat("\n")
+
     if (!is.null(active_assay)) {
       DefaultAssay(Seurat_object) <- active_assay
     }
@@ -232,11 +239,15 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
     #Add metadata and reductions
 
     if (!is.null(metadata_keys)) {
+      cat("Retrieving cell annotations from Seurat object...")
+      cat("\n")
       for (i in metadata_keys) {
         add_annotation_obs(adata_object, Seurat_object@meta.data[,i], i)
       }
     }
     if (!is.null(reduction_keys)) {
+      cat("Retrieving embedding coordinates from Seurat object...")
+      cat("\n")
       for (i in reduction_keys) {
         add_obsm(adata_object, Seurat_object@reductions[[i]]@cell.embeddings, paste0("X_", i))
       }
@@ -245,6 +256,8 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
     #Optional replacement of expression matrix
 
     if (replace_matrix==TRUE) {
+      cat("Retrieving gene expression matrix from Seurat object...")
+      cat("\n")
       if (matrix_slot=="counts") {
         add_X(adata_object, matrix(as.numeric(GetAssay(subset(Seurat_object, features=subset_genes), DefaultAssay(Seurat_object))@counts), ncol=ncol(GetAssay(subset(Seurat_object, features=subset_genes), DefaultAssay(Seurat_object))@counts)), transpose=T, compress=T)
       } else {
@@ -256,6 +269,8 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
   #Optional subset of anndata object
 
   if (!is.null(subset_key_anndata)) {
+    cat("Subsetting anndata object (identities)...")
+    cat("\n")
     if (!is.null(subset_ident_anndata)) {
       all_cells <- adata_object$obs_names$tolist()
       chosen_cells <- all_cells[adata_object$obs[subset_key_anndata][,subset_key_anndata] %in% subset_ident_anndata]
@@ -266,16 +281,22 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
   }
 
   if (!exists("from_looms") & !is.null(cells_to_keep)) {
+    cat("Subsetting anndata object (cells)...")
+    cat("\n")
     adata_object <- subset_anndata_cells(adata_object, cells_to_keep)
   }
 
   if (!exists("from_looms") & !is.null(genes_to_keep)) {
+    cat("Subsetting anndata object (genes)...")
+    cat("\n")
     adata_object <- subset_anndata_cells(adata_object, genes_to_keep)
   }
 
   #Optional external metadata
 
   if (!is.null(user_metadata)) {
+    cat("Integrating user-provided cell annotations...")
+    cat("\n")
     for (i in colnames(user_metadata)) {
       add_annotation_obs(adata_object, user_metadata[,i], i)
     }
@@ -284,6 +305,8 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
   #Optional external embedding
 
   if (!is.null(user_embedding)) {
+    cat("Integrating user-provided embedding coordinates...")
+    cat("\n")
     if (!is.null(user_embedding_name)) {
       add_obsm(adata_object, user_embedding, paste0("X_", user_embedding_name))
     } else {
@@ -385,6 +408,8 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     adata <- adata$copy()
   }
 
+  cat("Now printing Scanpy output messages...")
+  cat("\n")
 
   #Basic filtering
 
@@ -723,6 +748,10 @@ compute_velocity <- function (adata, min_counts=NULL, min_cells=NULL, max_counts
   if (adata_copy==TRUE) {
     adata = adata$copy()
   }
+
+  cat("Now printing scVelo output messages...")
+  cat("\n")
+
   gene_filters <- list(min_counts, min_cells, max_counts, max_cells, min_counts_u, min_cells_u, max_counts_u, max_cells_u, min_shared_counts, min_shared_cells)
   for (i in 1:length(gene_filters)) {
     if (!is.null(gene_filters[[i]])) {
@@ -832,6 +861,9 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
     stop("lab_order is not a list")
   }
 
+  cat("Now printing scVelo output messages...")
+  cat("\n")
+
   if (!("velocity_graph" %in% names(adata$uns$data)) | force_graph_recalc==TRUE) {
     if (!is.null(n_cores)) {
       n_cores <- as.integer(n_cores)
@@ -871,6 +903,8 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
     file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
   }
 
+  cat("Removing temporary figures directory...")
+  cat("\n")
   unlink("figures", recursive=TRUE)
 
   files_to_rename <- dir()[grep("scvelo_",dir())]
@@ -1369,6 +1403,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 
   if (exists("shelf")) {
     shelf$close()
+    cat("Removing temporary python dictionary...")
+    cat("\n")
 #    unlink(dir()[grep("temp_shelf", dir())])
   }
 
@@ -1952,6 +1988,8 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   for (m in dir("figures")) {
     file.copy(paste0('./figures/', m), paste0('./', m), overwrite=TRUE)
   }
+  cat("Removing temporary figures directory...")
+  cat("\n")
   unlink("figures", recursive=TRUE)
   }
 
@@ -1971,7 +2009,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
 #' @title compute_graph_and_stream
 #'
-#' @description Computes the cell-cell transition probabilites based on the correlation of the velocities of the entropy of each cell with the entropies of neighboring cells. Then, based on such probabilites, draws the streamplot on an embedding of choice (the default is UMAP). scVelo is used for all the computation
+#' @description Computes the cell-cell transition probabilites based on the correlation of the velocities of the entropy of each cell with the entropies of neighboring cells. Then, based on such probabilites, draws the streamplot on an embedding of choice (the default is UMAP). scVelo has been adapted to perform all the computation
 #'
 #' @param adata anndata object with "partial_entropies_observed" and "velocity_of_the_entropy" layers (produced by the "compute_signaling_entropy" function)
 #' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The streamplot will be saved in the "velocity_field_streamplots" sub-directory
@@ -2028,6 +2066,9 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
   if (adata_copy==TRUE) {
     adata <- adata$copy()
   }
+
+  cat("Now printing scVelo output messages...")
+  cat("\n")
 
   if (force_graph_recalc==TRUE) {
 
@@ -2108,6 +2149,8 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
     file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
   }
 
+  cat("Removing temporary figures directory...")
+  cat("\n")
   unlink("figures", recursive=TRUE)
 
   files_to_rename <- dir()[grep("scvelo_",dir())]
