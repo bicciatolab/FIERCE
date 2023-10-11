@@ -21,6 +21,7 @@ compute_velocity(
   n_neighbors = 30,
   mode_moments = "connectivities",
   use_raw = FALSE,
+  n_cores = NULL,
   adata_copy = TRUE
 )
 }
@@ -56,6 +57,8 @@ compute_velocity(
 \item{mode_moments}{method for first order moments computation. Choose between "distances" or "connectivities". Default is "connectivities"}
 
 \item{use_raw}{boolean; whether to use normalized counts for velocity computation instead of first order moments. Default is FALSE}
+
+\item{n_cores}{number of cores to use for dynamical model fitting. If NULL (default), only 1 will be used}
 
 \item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
 }

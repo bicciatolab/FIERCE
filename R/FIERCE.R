@@ -2,6 +2,30 @@
 ####################              FIERCE                    ####################
 ################################################################################
 
+#' @title set_FIERCE_workspace
+#'
+#' @description Sets the current R workspace for the FIERCE pipeline, with all the necessary dependencies and the helper functions that interface R with python. This function must be always launched before using FIERCE
+#'
+#' @return The function loads in the current R workspace all the necessary dependencies and all the helper functions that interface R with python
+#'
+#' @examples
+#' Simply launch the function with no arguments
+#'
+#' set_FIERCE_workspace()
+#'
+#' @exportPattern "^[[:alpha:]]+"
+#' @importFrom magrittr "%>%"
+#'
+#' @export
+#'
+
+set_FIERCE_workspace <- function() {
+  library(reticulate)
+  use_condaenv("FIERCE")
+  source_python(system.file("inter_environment_utils.py", package = "FIERCE", lib.loc= .libPaths()),envir=globalenv())
+}
+
+
 #' @title load_test_dataset
 #'
 #' @description Loads the specified test dataset

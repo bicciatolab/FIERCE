@@ -18,6 +18,7 @@ plot_velocity(
   alpha = 0.3,
   add_outline = TRUE,
   min_mass = 4,
+  n_cores = NULL,
   adata_copy = TRUE
 )
 }
@@ -47,6 +48,8 @@ plot_velocity(
 \item{add_outline}{whether to add an outline around groups of dots on the streamplots. Default is TRUE}
 
 \item{min_mass}{minimum magnitude required for velocity vectors to be drawn on the streamplot, ranging from 0 (all vectors) to 5 (most intense vectors only). Default is 4}
+
+\item{n_cores}{number of cores to use to compute the cell-cell transition probability matrix (most computationally expensive step). If NULL (default), only 1 will be used}
 
 \item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
 }

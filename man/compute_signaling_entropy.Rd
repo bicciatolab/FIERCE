@@ -54,24 +54,26 @@ compute_signaling_entropy(
 \item{phenotype_annotation}{only used if compute_potency_states=TRUE; name of the cell annotation in the "obs" slot to combine with the distribution of total entropies for potency states computation}
 
 \item{potency_states_only_mode}{if this mode is "on", only the potency states are computed from pre-existing entropy scores that are already stored in the anndata object. Very useful if the user wishes to try different phenotype annotations for potency states computation. Default is "off", change to "on" to activate}
+
+\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
 }
 \value{
-a new anndata object with the results of the analysis. The matrix of the velocities of the entropy and the matrices of the partial entropies (both observed and future) will be saved as additional layers
+If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the matrix of the velocities of the entropy and the matrices of the partial entropies (both observed and future) will be saved as additional layers
 }
 \description{
-Computes both observed and future signaling entropies from observed and future spliced transcriptional states, respectively, and then computes the velocities of the entropy by subtracting observed entropies from future entropies. Signaling entropy is computed by the SCENT package, that works on the distribution of the expression signal of cells on a genome-wide Protein-Protein Interaction (PPI) network. Spliced transcriptional states are defined either as normalized spliced counts, or as spliced first order moments, depending on the input data from which gene velocities have been previously computed (see "compute_velocity" function). WARNING: signaling entropy is very accurate, but, as a downside, requires a very long computational time, especially for particularly large datasets. To avoid losing precious data, FIERCE subdivides the dataset into smaller batches (5000 cells by default, but it can be changed through the dedicated option) and saves the results after the computations for each batch are concluded. These results are saved into a temporary python dictionary that is placed into the current working directory, and is automatically removed after all the computations have been done. DO NOT REMOVE the dictionary until then, or you'll lose all the computations. If the computations are accidentally interrupted, just re-launch the function with the same command, and FIERCE will continue the analysis from the point where it was interrupted. WARNING: unlike the other functions of FIERCE, "compute_signaling_entropy" necessarily creates a new anndata object (i.e., it does not provide the "adata_copy" option), so be careful not to overwrite existing ones that you may need afterwards
+Computes both observed and future signaling entropies from observed and future spliced transcriptional states, respectively, and then computes the velocities of the entropy by subtracting observed entropies from future entropies. Signaling entropy is computed by the SCENT package, that works on the distribution of the expression signal of cells on a genome-wide Protein-Protein Interaction (PPI) network. Spliced transcriptional states are defined either as normalized spliced counts, or as spliced first order moments, depending on the input data from which gene velocities have been previously computed (see "compute_velocity" function). WARNING: signaling entropy is very accurate, but, as a downside, requires a very long computational time, especially for particularly large datasets. To avoid losing precious data, FIERCE subdivides the dataset into smaller batches (5000 cells by default, but it can be changed through the dedicated option) and saves the results after the computations for each batch are concluded. These results are saved into a temporary python dictionary that is placed into the current working directory, and is automatically removed after all the computations have been done. DO NOT REMOVE the dictionary until then, or you'll lose all the computations. If the computations are accidentally interrupted, just re-launch the function with the same command, and FIERCE will continue the analysis from the point where it was interrupted (in case of persistent performance issues, it is recommended to decrease the number of employed cores through the "n_cores" parameter). For large datasets, it is recommended to set "adata_copy" to FALSE, to progressively update the anndata object with new results as the analysis proceeds
 }
 \examples{
-#Run SCENT with the FIERCE built-in human gene symbol PPI network (high confidence). Infer potency states from total entropies and pre-computed cell clusters
+#Run SCENT with the FIERCE built-in human gene symbol PPI network (high confidence). Infer potency states from total entropies and pre-computed cell clusters. The results are saved in a new anndata object
 
 adata_velocity_entropy <- compute_signaling_entropy(adata=adata_velocity, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", compute_potency_states=TRUE, phenotype_annotation="clusters")
 
-#Run SCENT on normalized spliced counts (instead of spliced first order moments) with a user provided PPI network. Do not compute potency states
+#Run SCENT on normalized spliced counts (instead of spliced first order moments) with a user provided PPI network. Do not compute potency states. The results are saved in a new anndata object
 
-adata_velocity_entropy <- compute_signaling_entropy(adata=adata_velocity, use_raw=TRUE, use_builtin_network=FALSE, user_network=PPI_network, compute_potency_states=FALSE, adata_copy=FALSE)
+adata_velocity_entropy <- compute_signaling_entropy(adata=adata_velocity, use_raw=TRUE, use_builtin_network=FALSE, user_network=PPI_network, compute_potency_states=FALSE)
 
-#Run function in potency_states_only_mode, i.e., only the potency states will be computed from pre-existing entropy scores that are already stored in the anndata object
+#Run function in potency_states_only_mode, i.e., only the potency states will be computed from pre-existing entropy scores that are already stored in the anndata object. Update the provided anndata object
 
-adata_velocity_entropy <- compute_signaling_entropy(adata=adata_velocity_entropy, phenotype_annotation="clusters", potency_states_only_mode="on")
+compute_signaling_entropy(adata=adata_velocity_entropy, phenotype_annotation="clusters", potency_states_only_mode="on", adata_copy=FALSE)
 
 }
