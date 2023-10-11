@@ -892,7 +892,7 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
     if (!is.null(n_cores)) {
       n_cores <- as.integer(n_cores)
     }
-    scv$tl$velocity_graph(adata, sqrt_transform=sqrt_transform, njobs=n_cores)
+    scv$tl$velocity_graph(adata, sqrt_transform=sqrt_transform, n_jobs=n_cores)
   }
 
   if (compute_latent_time==TRUE) {
