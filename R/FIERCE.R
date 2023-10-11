@@ -888,7 +888,7 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
   cat("Now printing scVelo output messages...")
   cat("\n")
 
-  if (!("velocity_graph" %in% names(adata$uns$data)) | force_graph_recalc==TRUE) {
+  if (check_uns(adata, "velocity_graph")=="No" | force_graph_recalc==TRUE) {
     if (!is.null(n_cores)) {
       n_cores <- as.integer(n_cores)
     }
