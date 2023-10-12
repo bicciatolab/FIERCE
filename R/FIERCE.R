@@ -1827,13 +1827,19 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
     dir.create(project_dir)
   }
   if (redo_from_scratch==TRUE) {
-    delete_uns(adata, "pca_entropy")
+    if (check_uns(adata,"pca_entropy")=="Yes") {
+      delete_uns(adata,"pca_entropy")
+    }
     for (j in n_neighbors) {
 	    for (i in n_pcs) {
-		    delete_uns(adata,paste0('umap_entropy_n', as.character(j), 'pc', as.character(i)))
+        if (check_uns(adata,paste0('umap_entropy_n', as.character(j), 'pc', as.character(i)))=="Yes") {
+		      delete_uns(adata,paste0('umap_entropy_n', as.character(j), 'pc', as.character(i)))
+        }
 	    }
     }
-    unlink(paste0(project_dir, "/UMAP_from_entropy"), recursive=TRUE)
+    if (dir.exists(paste0(project_dir, "/UMAP_from_entropy")) == TRUE) {
+      unlink(paste0(project_dir, "/UMAP_from_entropy"), recursive=TRUE)
+    }
   }
   if (dir.exists(paste0(project_dir, "/UMAP_from_entropy")) == FALSE) {
     dir.create(paste0(project_dir, "/UMAP_from_entropy"))
