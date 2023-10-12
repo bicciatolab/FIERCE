@@ -1505,7 +1505,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   if (is.null(phenotype_colors)) {
     phenotype_colors <- list()
     for (i in 1:length(pheno.v)) {
-      if (!paste0(phenotype_annotation[i], "_colors")%in%names(adata$uns['data'])) {
+      if (check_uns(adata,paste0(phenotype_annotation[i], "_colors"))=="No") {
         phenotype_colors[[i]] <- my_palette_extended[1:length(names(table(pheno.v[[i]])))]
       } else {
         stored_colors <- adata$uns[paste0(phenotype_annotation[i], "_colors")]
@@ -1521,7 +1521,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 
   for (i in 1:length(phenotype_colors)) {
     if (is.null(phenotype_colors[[i]])) {
-      if (!paste0(phenotype_annotation[i], "_colors")%in%names(adata$uns['data'])) {
+      if (check_uns(adata,paste0(phenotype_annotation[i], "_colors"))=="No") {
         phenotype_colors[[i]] <- my_palette_extended[1:length(names(table(pheno.v[[i]])))]
       } else {
         stored_colors <- adata$uns[paste0(phenotype_annotation[i], "_colors")]
@@ -1803,6 +1803,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #' @param legend_loc localization of the legend on the PCA and UMAP plots. Default is "right margin"
 #' @param alpha transparency of the dots on the PCA and UMAP plots, ranging from 0 (fully transparent) to 1 (fully opaque). Default is 1
 #' @param add_outline whether to add an outline around groups of dots on the PCA and UMAP plots. Default is FALSE
+#' @param redo_from_scratch boolean, set it to TRUE to re-compute the PCs and UMAP coordinates and re-draw all the plots from scratch (otherwise, all the steps that have been already performed will be skipped if the function is launched a second time)
 #' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
 #'
 #' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the PCs and the UMAP coordinates computed from observed entropies will be saved in the "obsm" slot. The nearest neighbor graph (the last that has been computed) will be saved in the "uns" and "obsp" slots
@@ -1818,12 +1819,21 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #'
 #'
 
-compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_pipeline", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, adata_copy=TRUE) {
+compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_pipeline", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, redo_from_scratch=FALSE, adata_copy=TRUE) {
   sc <- import("scanpy")
   ad <- import("anndata")
   current_wd <- getwd()
   if (dir.exists(project_dir) == FALSE) {
     dir.create(project_dir)
+  }
+  if (redo_from_scratch==TRUE) {
+    delete_uns(adata, "pca_entropy")
+    for (j in n_neighbors) {
+	    for (i in n_pcs) {
+		    delete_uns(adata,paste0('umap_entropy_n', as.character(j), 'pc', as.character(i)))
+	    }
+    }
+    unlink(paste0(project_dir, "/UMAP_from_entropy"), recursive=TRUE)
   }
   if (dir.exists(paste0(project_dir, "/UMAP_from_entropy")) == FALSE) {
     dir.create(paste0(project_dir, "/UMAP_from_entropy"))
@@ -2012,8 +2022,6 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   for (m in dir("figures")) {
     file.copy(paste0('./figures/', m), paste0('./', m), overwrite=TRUE)
   }
-  cat("Removing temporary figures directory...")
-  cat("\n")
   unlink("figures", recursive=TRUE)
   }
 
@@ -2022,6 +2030,9 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   }
 
   }
+
+  cat("Removing temporary figures directory...")
+  cat("\n")
 
   setwd(current_wd)
 

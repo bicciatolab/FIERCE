@@ -17,6 +17,7 @@ compute_entropy_UMAP(
   legend_loc = "right margin",
   alpha = 1,
   add_outline = FALSE,
+  redo_from_scratch = FALSE,
   adata_copy = TRUE
 )
 }
@@ -44,6 +45,8 @@ compute_entropy_UMAP(
 \item{alpha}{transparency of the dots on the PCA and UMAP plots, ranging from 0 (fully transparent) to 1 (fully opaque). Default is 1}
 
 \item{add_outline}{whether to add an outline around groups of dots on the PCA and UMAP plots. Default is FALSE}
+
+\item{redo_from_scratch}{boolean, set it to TRUE to re-compute the PCs and UMAP coordinates and re-draw all the plots from scratch (otherwise, all the steps that have been already performed will be skipped if the function is launched a second time)}
 
 \item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
 }
