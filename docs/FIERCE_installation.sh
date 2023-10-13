@@ -7,7 +7,7 @@ conda activate FIERCE
 
 python -m pip install cython
 #pip3 install Cython==0.29.32 
-pip3 install velocyto==0.17.17 scvelo scikit-learn
+pip3 install velocyto==0.17.17 scvelo==0.2.4 scikit-learn==1.1.3
 
 #wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE_installation.R
 

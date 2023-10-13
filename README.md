@@ -78,7 +78,7 @@ Once attached the environment, use the following lines of code on your terminal 
 ```python
 python -m pip install cython
 #pip3 install Cython==0.29.32 
-pip3 install velocyto==0.17.17 scvelo scikit-learn
+pip3 install velocyto==0.17.17 scvelo==0.2.4 scikit-learn==1.1.3
 ```
 
 Since not all required R packages are provided by anaconda.org, some packages must be directly installed on the console, as described in [install packages in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r).
@@ -88,8 +88,8 @@ Since not all required R packages are provided by anaconda.org, some packages mu
 Before installing `FIERCE`, users must open their R console and run the following code to install the dependencies that are provided by CRAN, Bioconductor and Github.
 
 ```r
-CRANdep <- c("ranger","pbkrtest","BiocManager")
-versions <- c("0.14.1","0.5.1","1.30.19")
+CRANdep <- c("ranger","rlang","pbkrtest","BiocManager")
+versions <- c("0.14.1","1.0.6","0.5.1","1.30.19")
 for (i in 1:length(CRANdep)) {
   if (!(CRANdep[i] %in% installed.packages()[,"Package"]) | !(versions[i] %in% installed.packages()[installed.packages()[,"Package"]==CRANdep[i],"Version"])) {
       devtools::install_version(CRANdep[i], version = versions[i], repos = "https://cloud.r-project.org")
