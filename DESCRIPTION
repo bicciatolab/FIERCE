@@ -10,7 +10,7 @@ Encoding: UTF-8
 Depends:
     reticulate,
     SCENT,
-    Seurat,
+#    Seurat,
     ggplot2,
     reshape2,
     scales,
