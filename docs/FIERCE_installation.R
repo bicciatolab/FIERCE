@@ -1,5 +1,5 @@
 CRANdep <- c("ranger","rlang","pbkrtest","BiocManager")
-versions <- c("0.14.1","1.0.6","0.5.1","1.30.19")
+versions <- c("0.14.1","1.1.0","0.5.1","1.30.19")
 for (i in 1:length(CRANdep)) {
   if (!(CRANdep[i] %in% installed.packages()[,"Package"]) | !(versions[i] %in% installed.packages()[installed.packages()[,"Package"]==CRANdep[i],"Version"])) {
       devtools::install_version(CRANdep[i], version = versions[i], repos = "https://cloud.r-project.org")
