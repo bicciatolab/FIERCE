@@ -376,7 +376,7 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 #' @param plot_PCA_heatmap boolean; whether to plot the heatmap of the expression of the most significant genes for each PC. Default is TRUE
 #' @param scale_data boolean; whether to perform data scaling before PCA. Only used if perform_PCA=TRUE. Default is TRUE. WARNING: scaling is performed just for PCA, the expression matrix in the "X" slot will remain unscaled
 #' @param perform_regression boolean; whether to perform a regression procedure during data scaling. Only used if perform_PCA=TRUE and scale_data=TRUE. Default is FALSE
-#' @param regress_vars character vector containing the names of the numerical variables in the "obs" slot to include in the (optional) regression procedure. By default: "n_genes_by_counts", "total_counts" and "pct_counts_mt"
+#' @param regress_vars character vector containing the names of the numerical variables in the "obs" slot to include in the (optional) regression procedure. NULL by default
 #' @param compute_neighbor_graph boolean; whether to compute the nearest neighbor graph on the PC space. Default is TRUE
 #' @param n_neighbors number of nearest neighbors to compute for each cell in the nearest neighbor graph. Only used if compute_neighbor_graph=TRUE. Default is 30 neighbors
 #' @param n_pcs number of PCs to consider for the nearest neighbor graph computation. Only used if compute_neighbor_graph=TRUE. Default (NULL) is all the computed PCs
@@ -415,7 +415,7 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 #' @export
 #'
 
-perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", min_genes=NULL, min_cells=NULL, compute_QC_metrics=TRUE, compute_MT_fraction=TRUE, MT_prefix='MT-', UMI_lower_thr=NULL, UMI_upper_thr=NULL, Gene_lower_thr=NULL, Gene_upper_thr=NULL, MTf_lower_thr=NULL, MTf_upper_thr=NULL, do_normalization=TRUE, target_sum_for_norm=1e4, do_log_transform=TRUE, cell_cycle_scoring=FALSE, s_genes=NULL, g2m_genes=NULL, find_HVGs=TRUE, min_mean_HVGs=0.0125, max_mean_HVGs=3, min_disp_HVGs=0.5, max_disp_HVGs=Inf, n_top_HVGs=NULL, flavor_HVGs='seurat', subset_HVGs=FALSE, perform_PCA=TRUE, plot_PCA_heatmap=TRUE, scale_data=TRUE, perform_regression=FALSE, regress_vars=c('n_genes_by_counts', 'total_counts', 'pct_counts_mt'), compute_neighbor_graph=TRUE, n_neighbors=30, n_pcs=NULL, perform_clustering=TRUE, perform_UMAP=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, find_DEGs=TRUE, groups_for_DEGs=NULL, method_for_DEGs='wilcoxon', DEGs_to_show=25, adata_copy=FALSE) {
+perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", min_genes=NULL, min_cells=NULL, compute_QC_metrics=TRUE, compute_MT_fraction=TRUE, MT_prefix='MT-', UMI_lower_thr=NULL, UMI_upper_thr=NULL, Gene_lower_thr=NULL, Gene_upper_thr=NULL, MTf_lower_thr=NULL, MTf_upper_thr=NULL, do_normalization=TRUE, target_sum_for_norm=1e4, do_log_transform=TRUE, cell_cycle_scoring=FALSE, s_genes=NULL, g2m_genes=NULL, find_HVGs=TRUE, min_mean_HVGs=0.0125, max_mean_HVGs=3, min_disp_HVGs=0.5, max_disp_HVGs=Inf, n_top_HVGs=NULL, flavor_HVGs='seurat', subset_HVGs=FALSE, perform_PCA=TRUE, plot_PCA_heatmap=TRUE, scale_data=TRUE, perform_regression=FALSE, regress_vars=NULL, compute_neighbor_graph=TRUE, n_neighbors=30, n_pcs=NULL, perform_clustering=TRUE, perform_UMAP=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, find_DEGs=TRUE, groups_for_DEGs=NULL, method_for_DEGs='wilcoxon', DEGs_to_show=25, adata_copy=FALSE) {
   sc <- import("scanpy")
 
   current_wd <- getwd()
@@ -544,7 +544,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     if (scale_data==TRUE) {
       if ('highly_variable' %in% names(adata$var)) {
         adata_PCA <- subset_anndata_genes(adata, adata$var['highly_variable']$highly_variable)
-        if (perform_regression==TRUE) {
+        if (perform_regression==TRUE & !is.null(regress_vars)) {
           sc$pp$regress_out(adata_PCA, regress_vars)
         }
         sc$pp$scale(adata_PCA)
@@ -562,7 +562,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
         adata_varm_PCs[adata_PCA$var_names$tolist(),] <- adata_PCA$varm['PCs']
         add_varm(adata, adata_varm_PCs, 'PCs')
       } else {
-        if (perform_regression==TRUE) {
+        if (perform_regression==TRUE & !is.null(regress_vars)) {
           sc$pp$regress_out(adata, regress_vars)
         }
         sc$pp$scale(adata)
