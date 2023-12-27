@@ -1446,6 +1446,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 #' @param phenotype_annotation character vector containing the names of the cell annotations in the "obs" slot to visualize on the boxplot of the total entropies and on the dotplot of the potency states. Any number of columns can be specified
 #' @param phenotype_order optional; list containing, for each phenotype annotation specified in phenotype_annotation, a character vector specifying the order by which the respective phenotype labels should be plotted. If it is not necessary to specify a particular order for a specific annotation, just write NULL. If it is not necessary to specify any order for any annotation, do not change the default value of this parameter
 #' @param phenotype_colors optional; list containing, for each phenotype annotation specified in phenotype_annotation, a character vector specifying the colors for the respective phenotype labels. If it is not necessary to specify any color for a specific annotation, just write NULL; in this case, a default color palette will be used. If it is not necessary to specify any color for any annotation, do not change the default value of this parameter; in this case, annotations will be colored according either to a default palette, or to the colors that are already stored in the anndata object ("uns" slot)
+#' @param horizontal whether to plot cell annotations on the horizontal axis on the boxplots. FALSE by default
 #'
 #' @return No objects are returned, the plots will be saved in the directory containing the results of the main FIERCE analysis ("signaling_entropy_plots" sub-directory)
 #'
@@ -1459,7 +1460,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 #' @export
 #'
 
-plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", phenotype_annotation=NULL, phenotype_order=NULL, phenotype_colors=NULL) {
+plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", phenotype_annotation=NULL, phenotype_order=NULL, phenotype_colors=NULL, horizontal=FALSE) {
   current_wd <- getwd()
   if (dir.exists(project_dir)==FALSE) {
     dir.create(project_dir)
@@ -1543,6 +1544,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   sr.v.fut <- adata$obs['total_entropies_future'][,'total_entropies_future']
 
   pdf("Boxplot_SR_per_phenotype.pdf", useDingbats=FALSE)
+  if (horizontal==FALSE) {
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = phenotypes, y = observed_entropies, fill = phenotypes)) +
@@ -1560,6 +1562,26 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     xlab(phenotype_annotation[i]) +
     ylab("Future total signaling entropy") +
     theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
+  }
+  } else {
+  for (i in 1:length(pheno.v)) {
+    df_i <- data.frame(observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
+    print(ggplot(df_i, aes(x = phenotypes, y = observed_entropies, fill = phenotypes)) +
+    geom_boxplot(show.legend = FALSE) +
+    scale_x_discrete(limits = rev(levels(df_i$phenotypes))) +
+    scale_fill_manual(values=phenotype_colors[[i]]) +
+    xlab(phenotype_annotation[i]) +
+    ylab("Observed total signaling entropy") +
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
+    df_i <- data.frame(future_entropies=sr.v.fut, phenotypes=pheno.v[[i]])
+    print(ggplot(df_i, aes(x = phenotypes, y = future_entropies, fill = phenotypes)) +
+    geom_boxplot(show.legend = FALSE) +
+    scale_x_discrete(limits = rev(levels(df_i$phenotypes))) +
+    scale_fill_manual(values=phenotype_colors[[i]]) +
+    xlab(phenotype_annotation[i]) +
+    ylab("Future total signaling entropy") +
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
+  }
   }
   dev.off()
 
