@@ -36,7 +36,7 @@ perform_preprocessing(
   plot_PCA_heatmap = TRUE,
   scale_data = TRUE,
   perform_regression = FALSE,
-  regress_vars = c("n_genes_by_counts", "total_counts", "pct_counts_mt"),
+  regress_vars = NULL,
   compute_neighbor_graph = TRUE,
   n_neighbors = 30,
   n_pcs = NULL,
@@ -118,7 +118,7 @@ perform_preprocessing(
 
 \item{perform_regression}{boolean; whether to perform a regression procedure during data scaling. Only used if perform_PCA=TRUE and scale_data=TRUE. Default is FALSE}
 
-\item{regress_vars}{character vector containing the names of the numerical variables in the "obs" slot to include in the (optional) regression procedure. By default: "n_genes_by_counts", "total_counts" and "pct_counts_mt"}
+\item{regress_vars}{character vector containing the names of the numerical variables in the "obs" slot to include in the (optional) regression procedure. NULL by default}
 
 \item{compute_neighbor_graph}{boolean; whether to compute the nearest neighbor graph on the PC space. Default is TRUE}
 

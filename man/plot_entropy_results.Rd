@@ -9,7 +9,8 @@ plot_entropy_results(
   project_dir = "./Velocity_of_the_entropy_pipeline",
   phenotype_annotation = NULL,
   phenotype_order = NULL,
-  phenotype_colors = NULL
+  phenotype_colors = NULL,
+  horizontal = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ plot_entropy_results(
 \item{phenotype_order}{optional; list containing, for each phenotype annotation specified in phenotype_annotation, a character vector specifying the order by which the respective phenotype labels should be plotted. If it is not necessary to specify a particular order for a specific annotation, just write NULL. If it is not necessary to specify any order for any annotation, do not change the default value of this parameter}
 
 \item{phenotype_colors}{optional; list containing, for each phenotype annotation specified in phenotype_annotation, a character vector specifying the colors for the respective phenotype labels. If it is not necessary to specify any color for a specific annotation, just write NULL; in this case, a default color palette will be used. If it is not necessary to specify any color for any annotation, do not change the default value of this parameter; in this case, annotations will be colored according either to a default palette, or to the colors that are already stored in the anndata object ("uns" slot)}
+
+\item{horizontal}{whether to plot cell annotations on the horizontal axis on the boxplots. FALSE by default}
 }
 \value{
 No objects are returned, the plots will be saved in the directory containing the results of the main FIERCE analysis ("signaling_entropy_plots" sub-directory)
