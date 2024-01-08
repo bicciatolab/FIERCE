@@ -723,7 +723,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 }
 
 
-#' @title compute_velocity
+#' @title compute_future_states
 #'
 #' @description Computes gene velocities with scVelo and infers future spliced transcriptional states by summing velocities to observed states. Velocities can be computed either from the spliced and unspliced normalized counts, or from the spliced and unspliced first order moments (default procedure of scVelo). The spliced transcriptional states will be consequently defined either as spliced normalized counts, or spliced first order moments
 #'
@@ -751,15 +751,15 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #' @examples
 #' #Compute velocities and future spliced transcriptional states for all genes. Save results in a separate anndata object
 #'
-#' adata_velocity <- compute_velocity(adata)
+#' adata_velocity <- compute_future_states(adata)
 #'
 #' #Compute velocities and future spliced transcriptional states only for the genes that are expressed with at least 20 normalized spliced or unspliced counts across all cells. Save results in a separate anndata object
 #'
-#' adata_velocity <- compute_velocity(adata, min_shared_counts=20)
+#' adata_velocity <- compute_future_states(adata, min_shared_counts=20)
 #'
 #' #Compute velocities and future spliced transcriptional states for all genes using normalized counts instead of first order moments. Update the provided anndata object
 #'
-#' compute_velocity(adata, use_raw=TRUE, adata_copy=FALSE)
+#' compute_future_states(adata, use_raw=TRUE, adata_copy=FALSE)
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -767,7 +767,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #' @export
 #'
 
-compute_velocity <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=TRUE) {
+compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=TRUE) {
   scv <- import("scvelo")
   if (adata_copy==TRUE) {
     adata = adata$copy()

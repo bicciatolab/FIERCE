@@ -2,9 +2,9 @@
 
 export(build_adata_object)
 export(compute_entropy_UMAP)
+export(compute_future_states)
 export(compute_graph_and_stream)
 export(compute_signaling_entropy)
-export(compute_velocity)
 export(load_h5ad)
 export(load_test_dataset)
 export(perform_preprocessing)
