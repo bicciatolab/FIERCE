@@ -108,6 +108,7 @@ for (i in 1:length(BioCdep)) {
 ```
 
 ```r
+if(!"qlcMatrix"%in% installed.packages()[,"Package"]){devtools::install_github("cysouw/qlcMatrix")}
 if(!"SCENT"%in% installed.packages()[,"Package"]){devtools::install_github("aet21/SCENT")}
 
 ```

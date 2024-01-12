@@ -14,6 +14,7 @@ for (i in 1:length(BioCdep)) {
     }
 }
 
+if(!"qlcMatrix"%in% installed.packages()[,"Package"]){devtools::install_github("cysouw/qlcMatrix")}
 devtools::install_github("aet21/SCENT")
 
 devtools::install_github(

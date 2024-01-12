@@ -394,20 +394,20 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 #' @param DEGs_to_show number of DEGs to plot. Default is 25
 #' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
-#' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis
+#' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis
 #'
 #' @examples
-#' #Perform a complete analysis with default values, and return a new anndata object
+#' #Perform a complete analysis with default values
 #'
-#' adata_preprocessed <- perform_preprocessing(adata, adata_copy=TRUE)
+#' perform_preprocessing(adata)
 #'
-#' #Perform a complete analysis after setting thresholds for QC metrics, and return a new anndata object
+#' #Perform a complete analysis after setting thresholds for QC metrics
 #'
-#' adata_preprocessed <- perform_preprocessing(adata, min_genes=200, min_cells=3, UMI_lower_thr=1000, UMI_upper_thr=20000, Gene_lower_thr=500, Gene_upper_thr=6500, MTf_upper_thr=0.2, adata_copy=TRUE)
+#' perform_preprocessing(adata, min_genes=200, min_cells=3, UMI_lower_thr=1000, UMI_upper_thr=20000, Gene_lower_thr=500, Gene_upper_thr=6500, MTf_upper_thr=0.2)
 #'
-#' #Perform a partial analysis on an anndata object that already contains pre-computed PCs: perform only clustering, UMAP and DEGs, skip all previous steps. Update the provided anndata object with the new results
+#' #Perform a partial analysis on an anndata object that already contains pre-computed PCs: perform only clustering, UMAP and DEGs, skip all previous steps. Create a new anndata object with the results of the analysis
 #'
-#' perform_preprocessing(adata, compute_QC_metrics=FALSE, do_normalization=FALSE, do_log_transform=FALSE, find_HVGs=FALSE, perform_PCA=FALSE)
+#' adata_preprocessed <- perform_preprocessing(adata, compute_QC_metrics=FALSE, do_normalization=FALSE, do_log_transform=FALSE, find_HVGs=FALSE, perform_PCA=FALSE, adata_copy=TRUE)
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -744,22 +744,22 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #' @param mode_moments method for first order moments computation. Choose between "distances" or "connectivities". Default is "connectivities"
 #' @param use_raw boolean; whether to use normalized counts for velocity computation instead of first order moments. Default is FALSE
 #' @param n_cores number of cores to use for dynamical model fitting. If NULL (default), only 1 will be used
-#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
+#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
-#' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, velocities, first order moments (both spliced and unspliced) and future spliced transcriptional states will be saved as additional layers
+#' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, velocities, first order moments (both spliced and unspliced) and future spliced transcriptional states will be saved as additional layers
 #'
 #' @examples
-#' #Compute velocities and future spliced transcriptional states for all genes. Save results in a separate anndata object
+#' #Compute velocities and future spliced transcriptional states for all genes
 #'
-#' adata_velocity <- compute_future_states(adata)
+#' compute_future_states(adata)
 #'
-#' #Compute velocities and future spliced transcriptional states only for the genes that are expressed with at least 20 normalized spliced or unspliced counts across all cells. Save results in a separate anndata object
+#' #Compute velocities and future spliced transcriptional states only for the genes that are expressed with at least 20 normalized spliced or unspliced counts across all cells
 #'
-#' adata_velocity <- compute_future_states(adata, min_shared_counts=20)
+#' compute_future_states(adata, min_shared_counts=20)
 #'
-#' #Compute velocities and future spliced transcriptional states for all genes using normalized counts instead of first order moments. Update the provided anndata object
+#' #Compute velocities and future spliced transcriptional states for all genes using normalized counts instead of first order moments. Save results in a separate anndata object
 #'
-#' compute_future_states(adata, use_raw=TRUE, adata_copy=FALSE)
+#' adata_future_states <- compute_future_states(adata, use_raw=TRUE, adata_copy=TRUE)
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -767,7 +767,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #' @export
 #'
 
-compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=TRUE) {
+compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
   if (adata_copy==TRUE) {
     adata = adata$copy()
@@ -842,14 +842,14 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
 #' @param add_outline whether to add an outline around groups of dots on the streamplots. Default is TRUE
 #' @param min_mass minimum magnitude required for velocity vectors to be drawn on the streamplot, ranging from 0 (all vectors) to 5 (most intense vectors only). Default is 4
 #' @param n_cores number of cores to use to compute the cell-cell transition probability matrix (most computationally expensive step). If NULL (default), only 1 will be used
-#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
+#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
-#' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
+#' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
 #'
 #' @examples
-#' #Draw the streamplot on the UMAP embedding. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
+#' #Draw the streamplot on the UMAP embedding. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only
 #'
-#' adata_velocity_stream <- plot_velocity(adata_velocity, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
+#' plot_velocity(adata, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -857,7 +857,7 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
 #' @export
 #'
 
-plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", sqrt_transform=TRUE, embedding_basis='umap', force_graph_recalc=FALSE, compute_latent_time=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=TRUE) {
+plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", sqrt_transform=TRUE, embedding_basis='umap', force_graph_recalc=FALSE, compute_latent_time=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
 
   if (check_layers(adata, "velocity")=="No") {
@@ -948,7 +948,7 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
 
 #' @title compute_signaling_entropy
 #'
-#' @description Computes both observed and future signaling entropies from observed and future spliced transcriptional states, respectively, and then computes the velocities of the entropy by subtracting observed entropies from future entropies. Signaling entropy is computed by the SCENT package, that works on the distribution of the expression signal of cells on a genome-wide Protein-Protein Interaction (PPI) network. Spliced transcriptional states are defined either as normalized spliced counts, or as spliced first order moments, depending on the input data from which gene velocities have been previously computed (see "compute_velocity" function). WARNING: signaling entropy is very accurate, but, as a downside, requires a very long computational time, especially for particularly large datasets. To avoid losing precious data, FIERCE subdivides the dataset into smaller batches (5000 cells by default, but it can be changed through the dedicated option) and saves the results after the computations for each batch are concluded. These results are saved into a temporary python dictionary that is placed into the current working directory, and is automatically removed after all the computations have been done. DO NOT REMOVE the dictionary until then, or you'll lose all the computations. If the computations are accidentally interrupted, just re-launch the function with the same command, and FIERCE will continue the analysis from the point where it was interrupted (in case of persistent performance issues, it is recommended to decrease the number of employed cores through the "n_cores" parameter). For large datasets, it is recommended to set "adata_copy" to FALSE, to progressively update the anndata object with new results as the analysis proceeds 
+#' @description Computes both observed and future signaling entropies from observed and future spliced transcriptional states, respectively, and then computes the velocities of the entropy by subtracting observed entropies from future entropies. Signaling entropy is computed by the SCENT package, that works on the distribution of the expression signal of cells on a genome-wide Protein-Protein Interaction (PPI) network. Spliced transcriptional states are defined either as normalized spliced counts, or as spliced first order moments, depending on the input data from which gene velocities have been previously computed (see "compute_velocity" function). WARNING: signaling entropy is very accurate, but, as a downside, requires a very long computational time, especially for particularly large datasets. To avoid losing precious data, FIERCE subdivides the dataset into smaller batches (5000 cells by default, but it can be changed through the dedicated option) and saves the results after the computations for each batch are concluded. These results are saved into a temporary python dictionary that is placed into the current working directory, and is automatically removed after all the computations have been done. DO NOT REMOVE the dictionary until then, or you'll lose all the computations. If the computations are accidentally interrupted, just re-launch the function with the same command, and FIERCE will continue the analysis from the point where it was interrupted (in case of persistent performance issues, it is recommended to decrease the number of employed cores through the "n_cores" parameter). For large datasets, it is recommended to set "adata_copy" to FALSE (to progressively update the anndata object with new results as the analysis proceeds) and to increase the number of cores through the "n_cores" function 
 #'
 #' @param adata anndata object generated by the "compute_velocity" function, and containing either the "spliced" and "spliced_future" layers, or the "Ms" and "Ms_future" layers
 #' @param use_raw boolean; whether gene velocities have been computed from the normalized counts instead of the first order moments (see documentation for "compute_velocity" function). This will affect the layer from which entropies will be computed. Default is FALSE
@@ -960,34 +960,34 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
 #' @param network_nomenclature only used if use_builtin_network=TRUE; gene nomenclature to use in the PPI network. Choose between "gene_symbol" or "entrez"
 #' @param network_threshold only used if use_builtin_network=TRUE; minimum level of confidence required for the edges (i.e., the protein-protein interactions) of the PPI network. Choose between "medium" and "high". Default is "high"
 #' @param user_network only used if use_builtin_network=FALSE and use_original_SCENT_network=FALSE; PPI network provided by the user. It must be a binary numeric matrix with gene names on both the rows and the columns, where 1 stands for "interaction" and 0 stands for "no interaction". The nomenclature of the genes must correspond to the nomenclature of the genes of the anndata object
-#' @param n_cores number of cores to use for entropy computation. Parallel computing option is provided as this is the most time-consuming step of the FIERCE pipeline
+#' @param n_cores number of cores to use for entropy computation. Default is 1. Parallel computing option is provided (and recommended) as this is the most time-consuming step of the FIERCE pipeline
 #' @param batch_size number of cells in each batch for entropy computation
 #' @param compute_potency_states boolean; whether to compute observed and future potency states by combining the distribution of total entropies with a pre-computed phenotype annotation. Default is FALSE
 #' @param phenotype_annotation only used if compute_potency_states=TRUE; name of the cell annotation in the "obs" slot to combine with the distribution of total entropies for potency states computation
 #' @param potency_states_only_mode if this mode is "on", only the potency states are computed from pre-existing entropy scores that are already stored in the anndata object. Very useful if the user wishes to try different phenotype annotations for potency states computation. Default is "off", change to "on" to activate
-#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
+#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
-#' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the matrix of the velocities of the entropy and the matrices of the partial entropies (both observed and future) will be saved as additional layers
+#' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the matrix of the velocities of the entropy and the matrices of the partial entropies (both observed and future) will be saved as additional layers
 #'
 #' @examples
-#' #Run SCENT with the FIERCE built-in human gene symbol PPI network (high confidence). Infer potency states from total entropies and pre-computed cell clusters. The results are saved in a new anndata object
+#' #Run SCENT with the FIERCE built-in human gene symbol PPI network (high confidence). Infer potency states from total entropies and pre-computed cell clusters. Use parallel computing with 20 cores
 #'
-#' adata_velocity_entropy <- compute_signaling_entropy(adata=adata_velocity, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", compute_potency_states=TRUE, phenotype_annotation="clusters")
+#' compute_signaling_entropy(adata, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", compute_potency_states=TRUE, phenotype_annotation="clusters", n_cores=20)
 #'
-#' #Run SCENT on normalized spliced counts (instead of spliced first order moments) with a user provided PPI network. Do not compute potency states. The results are saved in a new anndata object
+#' #Run SCENT on normalized spliced counts (instead of spliced first order moments) with a user provided PPI network. Do not compute potency states. Use parallel computing with 20 cores
 #'
-#' adata_velocity_entropy <- compute_signaling_entropy(adata=adata_velocity, use_raw=TRUE, use_builtin_network=FALSE, user_network=PPI_network, compute_potency_states=FALSE)
+#' compute_signaling_entropy(adata, use_raw=TRUE, use_builtin_network=FALSE, user_network=PPI_network, compute_potency_states=FALSE, n_cores=20)
 #'
-#' #Run function in potency_states_only_mode, i.e., only the potency states will be computed from pre-existing entropy scores that are already stored in the anndata object. Update the provided anndata object
+#' #Run function in potency_states_only_mode, i.e., only the potency states will be computed from pre-existing entropy scores that are already stored in the anndata object. The results are saved in a new anndata object
 #'
-#' compute_signaling_entropy(adata=adata_velocity_entropy, phenotype_annotation="clusters", potency_states_only_mode="on", adata_copy=FALSE)
+#' adata_potency_states <- compute_signaling_entropy(adata, phenotype_annotation="clusters", potency_states_only_mode="on", adata_copy=TRUE)
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
 #' @export
 #'
 
-compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_matrix=TRUE, use_original_SCENT_network=FALSE, most_recent_network=TRUE, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", user_network=NULL, n_cores=20, batch_size=5000, compute_potency_states=FALSE, phenotype_annotation=NULL, potency_states_only_mode="off", debug_mode=FALSE, adata_copy=TRUE) {
+compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_matrix=TRUE, use_original_SCENT_network=FALSE, most_recent_network=TRUE, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", user_network=NULL, n_cores=1, batch_size=5000, compute_potency_states=FALSE, phenotype_annotation=NULL, potency_states_only_mode="off", debug_mode=FALSE, adata_copy=FALSE) {
   if (is.null(adata)) {
     stop("Please provide an anndata object")
   }
@@ -1453,7 +1453,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 #' @examples
 #' In this example, the clusters, the cell types and the cell cycle phase are chosen as phenotype annotations. A specific label order and a specific color for each label are specified for the cell cycle phase only
 #'
-#' plot_entropy_results(adata_velocity_entropy, phenotype_annotation=c("clusters", "cell_types", "phase"), phenotype_order=list(NULL, NULL, c("G1","S","G2M")), phenotype_colors=list(NULL, NULL, c("green", "red", "blue")))
+#' plot_entropy_results(adata, phenotype_annotation=c("clusters", "cell_types", "phase"), phenotype_order=list(NULL, NULL, c("G1","S","G2M")), phenotype_colors=list(NULL, NULL, c("green", "red", "blue")))
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -1818,7 +1818,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #' @param n_neighbors number of nearest neighbors to compute for each cell in the nearest neighbor graph that will be used for UMAP embedding computation. If the user wishes to try different values for this parameter, an integer vector containing all the desired values can be specified (the results will be saved into dedicated folders). Default is 30 neighbors
 #' @param n_pcs number of PCs to consider for the nearest neighbor graph computation. If the user wishes to try different values for this parameter, an integer vector containing all the desired values can be specified (the results will be saved into dedicated folders). Default (NULL) is all the computed PCs (50). The PCs are computed directly from the observed entropies with the default PCA procedure of Scanpy
 #' @param plot_PCA_heatmap boolean; whether to plot the heatmap of the entropies of the most significant genes for each PC. Default is TRUE
-#' @param perform_clustering boolean; whether to perform clustering analysis on entropy values ("Leiden" algorithm). Default is TRUE. WARNING: a nearest neighbor graph must be computed first
+#' @param perform_clustering boolean; whether to perform clustering analysis on entropy values ("Leiden" algorithm). Default is FALSE. WARNING: a nearest neighbor graph must be computed first
 #' @param color_as character vector containing the names of the cell annotations in the "obs" slot to visualize on the PCA and UMAP plots. If present, the results of the clustering analysis will be visualized by default
 #' @param lab_order optional; list containing, for each cell annotation specified in "color_as", a character vector specifying the order by which the respective labels should be printed in the legends of the PCA and UMAP plots. If it is not necessary to specify a particular order for a specific annotation, just write NULL. If it is not necessary to specify any order for any annotation, do not change the default value of this parameter
 #' @param palette optional; list containing, for each cell annotation specified in "color_as", a character vector specifying the colors of the respective labels. If it is not necessary to specify any color for a specific annotation, just write NULL; in this case, a default color palette will be used. If it is not necessary to specify any color for any annotation, do not change the default value of this parameter; in this case, annotations will be colored according either to a default palette, or to the colors that are already stored in the anndata object ("uns" slot)
@@ -1826,14 +1826,14 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #' @param alpha transparency of the dots on the PCA and UMAP plots, ranging from 0 (fully transparent) to 1 (fully opaque). Default is 1
 #' @param add_outline whether to add an outline around groups of dots on the PCA and UMAP plots. Default is FALSE
 #' @param redo_from_scratch boolean, set it to TRUE to re-compute the PCs and UMAP coordinates and re-draw all the plots from scratch (otherwise, all the steps that have been already performed will be skipped if the function is launched a second time)
-#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
+#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
-#' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the PCs and the UMAP coordinates computed from observed entropies will be saved in the "obsm" slot. The nearest neighbor graph (the last that has been computed) will be saved in the "uns" and "obsp" slots
+#' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the PCs and the UMAP coordinates computed from observed entropies will be saved in the "obsm" slot. The nearest neighbor graph (the last that has been computed) will be saved in the "uns" and "obsp" slots
 #'
 #' @examples
-#' #Compute UMAP embeddings from observed entropies with default parameters. Separate UMAP embeddings are computed with 10, 30 and 100 neighbors. Additionally, the neighbor graph is computed multiple times considering 15, 30 and 50 PCs. In this example, the clusters, the cell types and the cell cycle phase are visualized on the PCA and UMAP plots. A specific label order and a specific color for each label is specified for the cell cycle phase only. The provided anndata object is updated
+#' #Compute UMAP embeddings from observed entropies with default parameters. Separate UMAP embeddings are computed with 10, 30 and 100 neighbors. Additionally, the neighbor graph is computed multiple times considering 15, 30 and 50 PCs. In this example, the clusters, the cell types and the cell cycle phase are visualized on the PCA and UMAP plots. A specific label order and a specific color for each label is specified for the cell cycle phase only
 #'
-#' compute_entropy_UMAP(adata_velocity_entropy, n_pcs=c(15,30,50), n_neighbors=c(10,30,100), color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
+#' compute_entropy_UMAP(adata, n_pcs=c(15,30,50), n_neighbors=c(10,30,100), color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -1841,7 +1841,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #'
 #'
 
-compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_pipeline", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, redo_from_scratch=FALSE, adata_copy=TRUE) {
+compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_pipeline", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, redo_from_scratch=FALSE, adata_copy=FALSE) {
   sc <- import("scanpy")
   ad <- import("anndata")
   current_wd <- getwd()
@@ -1959,7 +1959,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   }
 
   if (is.null(n_pcs)) {
-    n_pcs <- ncol(adata_temp$obsm['X_pca'])
+    n_pcs <- ncol(adata$obsm['X_pca_entropy'])
   }
 
   cat("Performing UMAP...")
@@ -2092,22 +2092,22 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 #' @param add_outline whether to add an outline around groups of dots on the streamplots. Default is TRUE
 #' @param min_mass minimum magnitude required for velocity vectors to be drawn on the streamplot, ranging from 0 (all vectors) to 5 (most intense vectors only). Default is 4
 #' @param n_cores number of cores to use to compute the cell-cell transition probability matrix (most computationally expensive step). If NULL (default), only 1 will be used
-#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE
+#' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
-#' @return If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
+#' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
 #'
 #' @examples
-#' #Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
+#' #Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only
 #'
-#' adata_velocity_entropy_stream <- compute_graph_and_stream(adata_velocity_entropy, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
+#' compute_graph_and_stream(adata, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
 #'
-#' #Draw the streamplot on the UMAP embedding by using only the best fit velocity genes for transition probabilities computation, and without the variance stabilizing transformation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
+#' #Draw the streamplot on the UMAP embedding by using only the best fit velocity genes for transition probabilities computation, and without the variance stabilizing transformation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only
 #'
-#' adata_velocity_entropy_stream <- compute_graph_and_stream(adata_velocity_entropy, only_velocity_genes=TRUE, sqrt_transform=FALSE, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
+#' compute_graph_and_stream(adata, only_velocity_genes=TRUE, sqrt_transform=FALSE, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
 #'
-#' #Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. A specific entropy-derived UMAP embedding (30 neighbors and 30 PCs) is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The provided anndata object is updated
+#' #Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. A specific entropy-derived UMAP embedding (30 neighbors and 30 PCs) is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
 #'
-#' compute_graph_and_stream(adata_velocity_entropy, n_neighbors_emb=30, n_pcs_emb=30, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
+#' adata_streamplot <- compute_graph_and_stream(adata, n_neighbors_emb=30, n_pcs_emb=30, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom magrittr "%>%"
@@ -2115,7 +2115,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 #'
 #'
 
-compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", only_velocity_genes=FALSE, n_neighbors_graph=NULL, n_pcs_graph=NULL, n_neighbors_emb=NULL, n_pcs_emb=NULL, sqrt_transform=TRUE, embedding_basis='umap_entropy', force_graph_recalc=TRUE, color_as='total_entropies_observed', lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=TRUE) {
+compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", only_velocity_genes=FALSE, n_neighbors_graph=NULL, n_pcs_graph=NULL, n_neighbors_emb=NULL, n_pcs_emb=NULL, sqrt_transform=TRUE, embedding_basis='umap_entropy', force_graph_recalc=TRUE, color_as='total_entropies_observed', lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
   current_wd <- getwd()
   if (dir.exists(project_dir) == FALSE) {
@@ -2136,7 +2136,7 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
   if (force_graph_recalc==TRUE) {
 
   if (is.null(n_neighbors_graph)) {
-    n_neighbors_graph <- ncol(adata$uns['neighbors']['indices'])
+    n_neighbors_graph <- adata$uns['neighbors']['params']$n_neighbors
   }
 
   if (is.null(n_pcs_graph)) {
@@ -2169,9 +2169,10 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
     obsm_list <- extract_obsm_keys(adata)
     last_obsm <- obsm_list[grep("X_umap_entropy",obsm_list)][length(obsm_list[grep("X_umap_entropy",obsm_list)])]
     placeholder <- unlist(strsplit(last_obsm,split="_"))[length(unlist(strsplit(last_obsm,split="_")))]
+    placeholder <- unlist(strsplit(placeholder,split="pc"))
     placeholder <- unlist(strsplit(placeholder,split="n"))
-    n_neighbors_emb <- placeholder[1]
-    n_pcs_emb <- placeholder[2]
+    n_neighbors_emb <- placeholder[2]
+    n_pcs_emb <- placeholder[3]
   }
 
   if (!is.null(palette) & !is.list(palette)) {
