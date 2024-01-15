@@ -153,22 +153,22 @@ perform_preprocessing(
 \item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE}
 }
 \value{
-If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis
+If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis
 }
 \description{
 Performs a full Scanpy analysis (optional) pipeline on the expression matrix (slot "X") of the provided anndata object, from quality checks to clustering. By tuning the appropriate parameters, the user is free to personalize the analysis and perform only the desired operations
 }
 \examples{
-#Perform a complete analysis with default values, and return a new anndata object
+#Perform a complete analysis with default values
 
-adata_preprocessed <- perform_preprocessing(adata, adata_copy=TRUE)
+perform_preprocessing(adata)
 
-#Perform a complete analysis after setting thresholds for QC metrics, and return a new anndata object
+#Perform a complete analysis after setting thresholds for QC metrics
 
-adata_preprocessed <- perform_preprocessing(adata, min_genes=200, min_cells=3, UMI_lower_thr=1000, UMI_upper_thr=20000, Gene_lower_thr=500, Gene_upper_thr=6500, MTf_upper_thr=0.2, adata_copy=TRUE)
+perform_preprocessing(adata, min_genes=200, min_cells=3, UMI_lower_thr=1000, UMI_upper_thr=20000, Gene_lower_thr=500, Gene_upper_thr=6500, MTf_upper_thr=0.2)
 
-#Perform a partial analysis on an anndata object that already contains pre-computed PCs: perform only clustering, UMAP and DEGs, skip all previous steps. Update the provided anndata object with the new results
+#Perform a partial analysis on an anndata object that already contains pre-computed PCs: perform only clustering, UMAP and DEGs, skip all previous steps. Create a new anndata object with the results of the analysis
 
-perform_preprocessing(adata, compute_QC_metrics=FALSE, do_normalization=FALSE, do_log_transform=FALSE, find_HVGs=FALSE, perform_PCA=FALSE)
+adata_preprocessed <- perform_preprocessing(adata, compute_QC_metrics=FALSE, do_normalization=FALSE, do_log_transform=FALSE, find_HVGs=FALSE, perform_PCA=FALSE, adata_copy=TRUE)
 
 }

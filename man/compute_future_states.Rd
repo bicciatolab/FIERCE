@@ -22,7 +22,7 @@ compute_future_states(
   mode_moments = "connectivities",
   use_raw = FALSE,
   n_cores = NULL,
-  adata_copy = TRUE
+  adata_copy = FALSE
 )
 }
 \arguments{
@@ -60,25 +60,25 @@ compute_future_states(
 
 \item{n_cores}{number of cores to use for dynamical model fitting. If NULL (default), only 1 will be used}
 
-\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
+\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE}
 }
 \value{
-If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, velocities, first order moments (both spliced and unspliced) and future spliced transcriptional states will be saved as additional layers
+If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, velocities, first order moments (both spliced and unspliced) and future spliced transcriptional states will be saved as additional layers
 }
 \description{
 Computes gene velocities with scVelo and infers future spliced transcriptional states by summing velocities to observed states. Velocities can be computed either from the spliced and unspliced normalized counts, or from the spliced and unspliced first order moments (default procedure of scVelo). The spliced transcriptional states will be consequently defined either as spliced normalized counts, or spliced first order moments
 }
 \examples{
-#Compute velocities and future spliced transcriptional states for all genes. Save results in a separate anndata object
+#Compute velocities and future spliced transcriptional states for all genes
 
-adata_velocity <- compute_future_states(adata)
+compute_future_states(adata)
 
-#Compute velocities and future spliced transcriptional states only for the genes that are expressed with at least 20 normalized spliced or unspliced counts across all cells. Save results in a separate anndata object
+#Compute velocities and future spliced transcriptional states only for the genes that are expressed with at least 20 normalized spliced or unspliced counts across all cells
 
-adata_velocity <- compute_future_states(adata, min_shared_counts=20)
+compute_future_states(adata, min_shared_counts=20)
 
-#Compute velocities and future spliced transcriptional states for all genes using normalized counts instead of first order moments. Update the provided anndata object
+#Compute velocities and future spliced transcriptional states for all genes using normalized counts instead of first order moments. Save results in a separate anndata object
 
-compute_future_states(adata, use_raw=TRUE, adata_copy=FALSE)
+adata_future_states <- compute_future_states(adata, use_raw=TRUE, adata_copy=TRUE)
 
 }

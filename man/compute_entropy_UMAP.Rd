@@ -10,7 +10,7 @@ compute_entropy_UMAP(
   n_neighbors = 30,
   n_pcs = NULL,
   plot_PCA_heatmap = TRUE,
-  perform_clustering = TRUE,
+  perform_clustering = FALSE,
   color_as = NULL,
   lab_order = NULL,
   palette = NULL,
@@ -18,7 +18,7 @@ compute_entropy_UMAP(
   alpha = 1,
   add_outline = FALSE,
   redo_from_scratch = FALSE,
-  adata_copy = TRUE
+  adata_copy = FALSE
 )
 }
 \arguments{
@@ -32,7 +32,7 @@ compute_entropy_UMAP(
 
 \item{plot_PCA_heatmap}{boolean; whether to plot the heatmap of the entropies of the most significant genes for each PC. Default is TRUE}
 
-\item{perform_clustering}{boolean; whether to perform clustering analysis on entropy values ("Leiden" algorithm). Default is TRUE. WARNING: a nearest neighbor graph must be computed first}
+\item{perform_clustering}{boolean; whether to perform clustering analysis on entropy values ("Leiden" algorithm). Default is FALSE. WARNING: a nearest neighbor graph must be computed first}
 
 \item{color_as}{character vector containing the names of the cell annotations in the "obs" slot to visualize on the PCA and UMAP plots. If present, the results of the clustering analysis will be visualized by default}
 
@@ -48,17 +48,17 @@ compute_entropy_UMAP(
 
 \item{redo_from_scratch}{boolean, set it to TRUE to re-compute the PCs and UMAP coordinates and re-draw all the plots from scratch (otherwise, all the steps that have been already performed will be skipped if the function is launched a second time)}
 
-\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
+\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE}
 }
 \value{
-If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the PCs and the UMAP coordinates computed from observed entropies will be saved in the "obsm" slot. The nearest neighbor graph (the last that has been computed) will be saved in the "uns" and "obsp" slots
+If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the PCs and the UMAP coordinates computed from observed entropies will be saved in the "obsm" slot. The nearest neighbor graph (the last that has been computed) will be saved in the "uns" and "obsp" slots
 }
 \description{
 Computes UMAP embeddings from observed entropies with Scanpy. First, a PCA is performed directly on entropy values, then a nearest neighbor graph is computed from resulting PCs, and finally the UMAP embedding is built on the neighbor graph. Optionally, a clustering analysis is also performed on the neighbor graph. The user can specify any combination of PCs and neighbors for UMAP computation, the results will be saved into separate folders
 }
 \examples{
-#Compute UMAP embeddings from observed entropies with default parameters. Separate UMAP embeddings are computed with 10, 30 and 100 neighbors. Additionally, the neighbor graph is computed multiple times considering 15, 30 and 50 PCs. In this example, the clusters, the cell types and the cell cycle phase are visualized on the PCA and UMAP plots. A specific label order and a specific color for each label is specified for the cell cycle phase only. The provided anndata object is updated
+#Compute UMAP embeddings from observed entropies with default parameters. Separate UMAP embeddings are computed with 10, 30 and 100 neighbors. Additionally, the neighbor graph is computed multiple times considering 15, 30 and 50 PCs. In this example, the clusters, the cell types and the cell cycle phase are visualized on the PCA and UMAP plots. A specific label order and a specific color for each label is specified for the cell cycle phase only
 
-compute_entropy_UMAP(adata_velocity_entropy, n_pcs=c(15,30,50), n_neighbors=c(10,30,100), color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
+compute_entropy_UMAP(adata, n_pcs=c(15,30,50), n_neighbors=c(10,30,100), color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
 
 }

@@ -35,6 +35,6 @@ Plots the results of "compute_signaling_entropy". Saves several plots that allow
 \examples{
 In this example, the clusters, the cell types and the cell cycle phase are chosen as phenotype annotations. A specific label order and a specific color for each label are specified for the cell cycle phase only
 
-plot_entropy_results(adata_velocity_entropy, phenotype_annotation=c("clusters", "cell_types", "phase"), phenotype_order=list(NULL, NULL, c("G1","S","G2M")), phenotype_colors=list(NULL, NULL, c("green", "red", "blue")))
+plot_entropy_results(adata, phenotype_annotation=c("clusters", "cell_types", "phase"), phenotype_order=list(NULL, NULL, c("G1","S","G2M")), phenotype_colors=list(NULL, NULL, c("green", "red", "blue")))
 
 }

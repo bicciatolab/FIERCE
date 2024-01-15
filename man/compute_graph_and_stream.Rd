@@ -23,7 +23,7 @@ compute_graph_and_stream(
   add_outline = TRUE,
   min_mass = 4,
   n_cores = NULL,
-  adata_copy = TRUE
+  adata_copy = FALSE
 )
 }
 \arguments{
@@ -63,25 +63,25 @@ compute_graph_and_stream(
 
 \item{n_cores}{number of cores to use to compute the cell-cell transition probability matrix (most computationally expensive step). If NULL (default), only 1 will be used}
 
-\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
+\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE}
 }
 \value{
-If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
+If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
 }
 \description{
 Computes the cell-cell transition probabilites based on the correlation of the velocities of the entropy of each cell with the entropies of neighboring cells. Then, based on such probabilites, draws the streamplot on an embedding of choice (the default is UMAP). scVelo has been adapted to perform all the computation
 }
 \examples{
-#Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
+#Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only
 
-adata_velocity_entropy_stream <- compute_graph_and_stream(adata_velocity_entropy, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
+compute_graph_and_stream(adata, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
 
-#Draw the streamplot on the UMAP embedding by using only the best fit velocity genes for transition probabilities computation, and without the variance stabilizing transformation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
+#Draw the streamplot on the UMAP embedding by using only the best fit velocity genes for transition probabilities computation, and without the variance stabilizing transformation. The last entropy-based embedding computed by the "compute_entropy_UMAP" function is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only
 
-adata_velocity_entropy_stream <- compute_graph_and_stream(adata_velocity_entropy, only_velocity_genes=TRUE, sqrt_transform=FALSE, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
+compute_graph_and_stream(adata, only_velocity_genes=TRUE, sqrt_transform=FALSE, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
 
-#Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. A specific entropy-derived UMAP embedding (30 neighbors and 30 PCs) is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The provided anndata object is updated
+#Draw the streamplot on the UMAP embedding by using all genes for transition probabilities computation. A specific entropy-derived UMAP embedding (30 neighbors and 30 PCs) is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
 
-compute_graph_and_stream(adata_velocity_entropy, n_neighbors_emb=30, n_pcs_emb=30, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
+adata_streamplot <- compute_graph_and_stream(adata, n_neighbors_emb=30, n_pcs_emb=30, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")), adata_copy=FALSE)
 
 }

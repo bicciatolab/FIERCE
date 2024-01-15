@@ -18,4 +18,4 @@ Depends:
     usethis,
     R (>= 3.5.0)
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0

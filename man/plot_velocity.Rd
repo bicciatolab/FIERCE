@@ -19,7 +19,7 @@ plot_velocity(
   add_outline = TRUE,
   min_mass = 4,
   n_cores = NULL,
-  adata_copy = TRUE
+  adata_copy = FALSE
 )
 }
 \arguments{
@@ -51,17 +51,17 @@ plot_velocity(
 
 \item{n_cores}{number of cores to use to compute the cell-cell transition probability matrix (most computationally expensive step). If NULL (default), only 1 will be used}
 
-\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is TRUE}
+\item{adata_copy}{boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE}
 }
 \value{
-If adata_copy=TRUE (default), a new anndata object with the results of the analysis will be returned. Otherwise, the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
+If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the velocity graph (correlations used for transition probabilities computation) will be saved in the "uns" slot, and the predicted displacements of cells (used for streamplot drawing) will be saved in the "obsm" slot
 }
 \description{
 Computes the RNA velocity vector field and draws the streamplot on an embedding of choice
 }
 \examples{
-#Draw the streamplot on the UMAP embedding. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only. The results are saved in a new anndata object
+#Draw the streamplot on the UMAP embedding. In this example, the clusters, the cell types and the cell cycle phase are visualized on the streamplot. A specific label order and a specific color for each label is specified for the cell cycle phase only
 
-adata_velocity_stream <- plot_velocity(adata_velocity, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
+plot_velocity(adata, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
 
 }
