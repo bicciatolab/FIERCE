@@ -23,6 +23,23 @@ set_FIERCE_workspace <- function() {
   library(reticulate)
   use_condaenv("FIERCE")
   source_python(system.file("inter_environment_utils.py", package = "FIERCE", lib.loc= .libPaths()),envir=globalenv())
+  move_plots <- function(project_dir, subfolder) {
+    if (dir.exists("figures") == TRUE) {
+      for (i in dir("figures")) {
+        file.copy(paste0('./figures/', i), paste0(project_dir, "/", subfolder, "/", i), overwrite=TRUE)
+      }
+      unlink("figures", recursive=TRUE)
+    }
+  }
+  assign("move_plots", move_plots, envir=.GlobalEnv)
+  rename_plots <- function(project_dir, subfolder) {
+    files_to_rename <- dir(paste0(project_dir, "/", subfolder))[grep("scvelo_",dir(paste0(project_dir, "/", subfolder)))]
+    for (j in files_to_rename) {
+      new_name <- strsplit(j, split="scvelo_")[[1]][2]
+      file.rename(paste0(project_dir, "/", subfolder, "/", j), paste0(project_dir, "/", subfolder, "/", new_name))
+    }
+  }
+  assign("rename_plots", rename_plots, envir=.GlobalEnv)
 }
 
 
@@ -418,7 +435,6 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", min_genes=NULL, min_cells=NULL, compute_QC_metrics=TRUE, compute_MT_fraction=TRUE, MT_prefix='MT-', UMI_lower_thr=NULL, UMI_upper_thr=NULL, Gene_lower_thr=NULL, Gene_upper_thr=NULL, MTf_lower_thr=NULL, MTf_upper_thr=NULL, do_normalization=TRUE, target_sum_for_norm=1e4, do_log_transform=TRUE, cell_cycle_scoring=FALSE, s_genes=NULL, g2m_genes=NULL, find_HVGs=TRUE, min_mean_HVGs=0.0125, max_mean_HVGs=3, min_disp_HVGs=0.5, max_disp_HVGs=Inf, n_top_HVGs=NULL, flavor_HVGs='seurat', subset_HVGs=FALSE, perform_PCA=TRUE, plot_PCA_heatmap=TRUE, scale_data=TRUE, perform_regression=FALSE, regress_vars=NULL, compute_neighbor_graph=TRUE, n_neighbors=30, n_pcs=NULL, perform_clustering=TRUE, perform_UMAP=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, find_DEGs=TRUE, groups_for_DEGs=NULL, method_for_DEGs='wilcoxon', DEGs_to_show=25, adata_copy=FALSE) {
   sc <- import("scanpy")
 
-  current_wd <- getwd()
   if (dir.exists(project_dir) == FALSE) {
     dir.create(project_dir)
   }
@@ -426,7 +442,6 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
   if (dir.exists(paste0(project_dir, "/scanpy_preprocessing")) == FALSE) {
     dir.create(paste0(project_dir, "/scanpy_preprocessing"))
   }
-  setwd(paste0(project_dir, "/scanpy_preprocessing"))
 
   if (adata_copy == TRUE) {
     adata <- adata$copy()
@@ -462,6 +477,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
 #    sink(prova, type = "message")
 
     sc$pl$violin(adata, vars_to_plot, jitter=as.numeric(0.4), multi_panel=TRUE, scale='count', save='_QC_metrics.pdf')
+    move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
 
 #    sink()
 
@@ -469,8 +485,10 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
       sc$pl$scatter(adata, x='total_counts', y='pct_counts_mt', save='_UMI_MTf.pdf')
       sc$pl$scatter(adata, x='n_genes_by_counts', y='pct_counts_mt', save='_Gene_MTf.pdf')
       sc$pl$scatter(adata, x='total_counts', y='n_genes_by_counts', save='_UMI_Gene.pdf')
+      move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
     } else {
       sc$pl$scatter(adata, x='total_counts', y='n_genes_by_counts', save='_UMI_Gene.pdf')
+      move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
     }
 
 #    sink()
@@ -529,6 +547,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     }
     sc$pp$highly_variable_genes(adata, min_mean=as.numeric(min_mean_HVGs), max_mean=as.numeric(max_mean_HVGs), min_disp=as.numeric(min_disp_HVGs), max_disp=as.numeric(max_disp_HVGs), n_top_genes=n_top_HVGs, flavor=flavor_HVGs, subset=subset_HVGs)
     sc$pl$highly_variable_genes(adata, save='.pdf')
+    move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
   }
 
 
@@ -595,6 +614,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
       }
     }
     sc$pl$pca_variance_ratio(adata, log=TRUE, save='.pdf')
+    move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
   }
 
   #neighbors
@@ -657,6 +677,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
       }
     }
   }
+  move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
 
   if (perform_UMAP==TRUE) {
     if (is.null(color_as)) {
@@ -682,6 +703,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
       }
     }
   }
+  move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
 
   #Rename HVGs
 
@@ -698,6 +720,7 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
         groups_for_DEGs <- "leiden"
         sc$tl$rank_genes_groups(adata, groupby=groups_for_DEGs, method=method_for_DEGs, use_raw=FALSE)
         sc$pl$rank_genes_groups(adata, n_genes=as.integer(DEGs_to_show), sharey=FALSE, save='.pdf')
+        move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
       } else {
         cat("WARNING: DEGs computation skipped - no groups defined")
         cat("\n")
@@ -705,17 +728,9 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     } else {
       sc$tl$rank_genes_groups(adata, groupby=groups_for_DEGs, method=method_for_DEGs, use_raw=FALSE)
       sc$pl$rank_genes_groups(adata, n_genes=as.integer(DEGs_to_show), sharey=FALSE, save='.pdf')
+      move_plots(project_dir=project_dir, subfolder="scanpy_preprocessing")
     }
   }
-
-  for (i in dir("figures")) {
-    file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
-  }
-  cat("Removing temporary figures directory...")
-  cat("\n")
-  unlink("figures", recursive=TRUE)
-
-  setwd(current_wd)
 
   if (adata_copy == TRUE) {
     return(adata)
@@ -864,14 +879,12 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
     stop("RNA velocity has not been computed yet, please launch compute_velocity first")
   }
 
-  current_wd <- getwd()
   if (dir.exists(project_dir) == FALSE) {
     dir.create(project_dir)
   }
   if (dir.exists(paste0(project_dir, "/velocity_field_streamplots")) == FALSE) {
     dir.create(paste0(project_dir, "/velocity_field_streamplots"))
   }
-  setwd(paste0(project_dir, "/velocity_field_streamplots"))
 
   if (adata_copy==TRUE) {
     adata = adata$copy()
@@ -922,23 +935,8 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
       draw_embedding(adata, file_name=paste0(embedding_basis, "_streamplot_RNA_velocity_", color_as[i]), emb=embedding_basis, stream=TRUE, c_as=color_as[i], c_type=c_type_i, pal=pal_i, c_ord=c_ord_i, vkey='velocity', legend_loc=legend_loc, alpha=alpha, add_outline=add_outline, min_mass=min_mass)
     }
   }
-
-  for (i in dir("figures")) {
-    file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
-  }
-
-  cat("Removing temporary figures directory...")
-  cat("\n")
-  unlink("figures", recursive=TRUE)
-
-  files_to_rename <- dir()[grep("scvelo_",dir())]
-
-  for (j in files_to_rename) {
-    new_name <- strsplit(j, split="scvelo_")[[1]][2]
-    file.rename(j, new_name)
-  }
-
-  setwd(current_wd)
+  move_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
+  rename_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
 
   if (adata_copy==TRUE) {
     return(adata)
@@ -1461,7 +1459,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 #'
 
 plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", phenotype_annotation=NULL, phenotype_order=NULL, phenotype_colors=NULL, horizontal=FALSE) {
-  current_wd <- getwd()
+
   if (dir.exists(project_dir)==FALSE) {
     dir.create(project_dir)
   }
@@ -1469,8 +1467,6 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   if (dir.exists(paste0(project_dir, "/signaling_entropy_plots"))==FALSE) {
     dir.create(paste0(project_dir, "/signaling_entropy_plots"))
   }
-
-  setwd(paste0(project_dir, "/signaling_entropy_plots"))
 
   if (is.null(phenotype_annotation)) {
     stop("Missing phenotype annotation")
@@ -1543,7 +1539,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   sr.v.obs <- adata$obs['total_entropies_observed'][,'total_entropies_observed']
   sr.v.fut <- adata$obs['total_entropies_future'][,'total_entropies_future']
 
-  pdf("Boxplot_SR_per_phenotype.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Boxplot_SR_per_phenotype.pdf"), useDingbats=FALSE)
   if (horizontal==FALSE) {
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
@@ -1572,7 +1568,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     scale_fill_manual(values=phenotype_colors[[i]]) +
     xlab(phenotype_annotation[i]) +
     ylab("Observed total signaling entropy") +
-    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)))
     df_i <- data.frame(future_entropies=sr.v.fut, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = phenotypes, y = future_entropies, fill = phenotypes)) +
     geom_boxplot(show.legend = FALSE) +
@@ -1580,7 +1576,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     scale_fill_manual(values=phenotype_colors[[i]]) +
     xlab(phenotype_annotation[i]) +
     ylab("Future total signaling entropy") +
-    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)))
   }
   }
   dev.off()
@@ -1611,7 +1607,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 
   cat("Boxplot expressed genes vs phenotype labels...")
   cat("\n")
-  pdf("Boxplot_expressed_genes_per_phenotype.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Boxplot_expressed_genes_per_phenotype.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(expressed_genes=expr.v, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = phenotypes, y = expressed_genes, fill = phenotypes)) +
@@ -1628,7 +1624,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   mean.expr.v<-apply(expression_matrix, 2, function(x) mean(x[x>0]))
   cat("Boxplot mean expression vs phenotype labels...")
   cat("\n")
-  pdf("Boxplot_mean_expression_per_phenotype.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Boxplot_mean_expression_per_phenotype.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(mean_expression=mean.expr.v, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = phenotypes, y = mean_expression, fill = phenotypes)) +
@@ -1645,7 +1641,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   median.expr.v<-apply(expression_matrix, 2, function(x) median(x[x>0]))
   cat("Boxplot median expression vs phenotype labels...")
   cat("\n")
-  pdf("Boxplot_median_expression_per_phenotype.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Boxplot_median_expression_per_phenotype.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(median_expression=median.expr.v, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = phenotypes, y = median_expression, fill = phenotypes)) +
@@ -1661,7 +1657,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   # scatterplot of expressed genes VS SR value
   cat("Scatterplot expressed genes vs SR...")
   cat("\n")
-  pdf("Scatterplot_expressed_genes_SR.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_expressed_genes_SR.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(expressed_genes=expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = expressed_genes, y = observed_entropies, color = phenotypes)) +
@@ -1684,7 +1680,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 
   cat("Scatterplot mean expression vs SR...")
   cat("\n")
-  pdf("Scatterplot_mean_expression_SR.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_mean_expression_SR.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(mean_expression=mean.expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = mean_expression, y = observed_entropies, color = phenotypes)) +
@@ -1707,7 +1703,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 
   cat("Scatterplot median expression vs SR...")
   cat("\n")
-  pdf("Scatterplot_median_expression_SR.pdf", useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_median_expression_SR.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(median_expression=median.expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = median_expression, y = observed_entropies, color = phenotypes)) +
@@ -1754,7 +1750,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     library(ggplot2)
     library(reshape2)
     library(scales)
-    pdf("Dotplot_potency_states.pdf", useDingbats=FALSE)
+    pdf(paste0(project_dir, "/signaling_entropy_plots/Dotplot_potency_states.pdf"), useDingbats=FALSE)
     for (i in 1:length(pheno.v)) {
       a.obs <- data.frame(POT=adata$obs['Potency_states_observed'][,'Potency_states_observed'], PHENO=pheno.v[[i]], ENT=sr.v.obs)
       a.fut <- data.frame(POT=adata$obs['Potency_states_future'][,'Potency_states_future'], PHENO=pheno.v[[i]], ENT=sr.v.fut)
@@ -1806,7 +1802,6 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     set_annot_levels(adata, c_as=phenotype_annotation[i], c_ord=c_ord_i, pal=col_i)
   }
 
-  setwd(current_wd)
 }
 
 #' @title compute_entropy_UMAP
@@ -1844,7 +1839,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_pipeline", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, redo_from_scratch=FALSE, adata_copy=FALSE) {
   sc <- import("scanpy")
   ad <- import("anndata")
-  current_wd <- getwd()
+
   if (dir.exists(project_dir) == FALSE) {
     dir.create(project_dir)
   }
@@ -1866,7 +1861,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   if (dir.exists(paste0(project_dir, "/UMAP_from_entropy")) == FALSE) {
     dir.create(paste0(project_dir, "/UMAP_from_entropy"))
   }
-  setwd(paste0(project_dir, "/UMAP_from_entropy"))
+
   if (adata_copy==TRUE) {
     adata <- adata$copy()
   }
@@ -1901,6 +1896,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
   if (!("pca_variance_ratio_entropy.pdf"%in%dir())) {
     sc$pl$pca_variance_ratio(adata_temp, log=TRUE, save='_entropy.pdf')
+    move_plots(project_dir=project_dir, subfolder="UMAP_from_entropy")
   }
   if ((plot_PCA_heatmap==TRUE) & !("pca_heatmap_entropy.pdf"%in%dir())) {
     pca_heatmap(adata_temp, components=as.integer(ncol(adata_temp$obsm['X_pca'])), use_raw=NULL, filename="figures/pca_heatmap_entropy.pdf")
@@ -1942,13 +1938,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
       }
     }
   }
-
-  if ("figures" %in% dir()) {
-  for (i in dir("figures")) {
-    file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
-  }
-  unlink("figures", recursive=TRUE)
-  }
+  move_plots(project_dir=project_dir, subfolder="UMAP_from_entropy")
 
   ##########
   ###UMAP###
@@ -2017,7 +2007,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   dir.create(paste0('n', as.character(j), 'pc', as.character(i)))
   }
 
-  setwd(paste0('n', as.character(j), 'pc', as.character(i)))
+  current_dir <- paste0('n', as.character(j), 'pc', as.character(i))
 
   if (is.null(color_as)) {
     if (!(paste0("umap_entropy_n", as.character(j), "pc", as.character(i), ".pdf")%in%dir())) {
@@ -2045,24 +2035,11 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
       }
     }
   }
-
-  if ("figures" %in% dir()) {
-  for (m in dir("figures")) {
-    file.copy(paste0('./figures/', m), paste0('./', m), overwrite=TRUE)
-  }
-  unlink("figures", recursive=TRUE)
-  }
-
-  setwd("..")
+  move_plots(project_dir=project_dir, subfolder=paste0("UMAP_from_entropy/", current_dir))
 
   }
 
   }
-
-  cat("Removing temporary figures directory...")
-  cat("\n")
-
-  setwd(current_wd)
 
   if (adata_copy==TRUE) {
     return(adata)
@@ -2117,14 +2094,13 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
 compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", only_velocity_genes=FALSE, n_neighbors_graph=NULL, n_pcs_graph=NULL, n_neighbors_emb=NULL, n_pcs_emb=NULL, sqrt_transform=TRUE, embedding_basis='umap_entropy', force_graph_recalc=TRUE, color_as='total_entropies_observed', lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
-  current_wd <- getwd()
+
   if (dir.exists(project_dir) == FALSE) {
     dir.create(project_dir)
   }
   if (dir.exists(paste0(project_dir, "/velocity_field_streamplots")) == FALSE) {
     dir.create(paste0(project_dir, "/velocity_field_streamplots"))
   }
-  setwd(paste0(project_dir, "/velocity_field_streamplots"))
 
   if (adata_copy==TRUE) {
     adata <- adata$copy()
@@ -2208,23 +2184,8 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
       draw_embedding(adata, file_name=paste0(embedding_basis, "_streamplot_FIERCE_", color_as[i]), emb=embedding_basis, stream=TRUE, c_as=color_as[i], c_type=c_type_i, pal=pal_i, c_ord=c_ord_i, legend_loc=legend_loc, alpha=alpha, add_outline=add_outline, min_mass=min_mass)
     }
   }
-
-  for (i in dir("figures")) {
-    file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
-  }
-
-  cat("Removing temporary figures directory...")
-  cat("\n")
-  unlink("figures", recursive=TRUE)
-
-  files_to_rename <- dir()[grep("scvelo_",dir())]
-
-  for (j in files_to_rename) {
-    new_name <- strsplit(j, split="scvelo_")[[1]][2]
-    file.rename(j, new_name)
-  }
-
-  setwd(current_wd)
+  move_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
+  rename_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
 
   if (adata_copy==TRUE) {
     return(adata)
