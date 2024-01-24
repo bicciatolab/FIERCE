@@ -1568,7 +1568,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     scale_fill_manual(values=phenotype_colors[[i]]) +
     xlab(phenotype_annotation[i]) +
     ylab("Observed total signaling entropy") +
-    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)))
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 45, hjust=1)))
     df_i <- data.frame(future_entropies=sr.v.fut, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = phenotypes, y = future_entropies, fill = phenotypes)) +
     geom_boxplot(show.legend = FALSE) +
@@ -1576,7 +1576,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     scale_fill_manual(values=phenotype_colors[[i]]) +
     xlab(phenotype_annotation[i]) +
     ylab("Future total signaling entropy") +
-    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)))
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 45, hjust=1)))
   }
   }
   dev.off()
