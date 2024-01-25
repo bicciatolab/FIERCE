@@ -1529,8 +1529,9 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
         }
         phenotype_colors[[i]] <- stored_colors2
       }
+    } else {
+        phenotype_colors[[i]] <- rev(phenotype_colors[[i]])
     }
-#    phenotype_colors[[i]] <- rev(phenotype_colors[[i]])
   }
 
   # boxplot of SR values VS phenotypic labels of interest
@@ -1546,7 +1547,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     print(ggplot(df_i, aes(x = phenotypes, y = observed_entropies, fill = phenotypes)) +
     geom_boxplot(show.legend = FALSE) +
     coord_flip() +
-    scale_fill_manual(values=rev(phenotype_colors[[i]])) +
+    scale_fill_manual(values=phenotype_colors[[i]]) +
     xlab(phenotype_annotation[i]) +
     ylab("Observed total signaling entropy") +
     theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
@@ -1554,7 +1555,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
     print(ggplot(df_i, aes(x = phenotypes, y = future_entropies, fill = phenotypes)) +
     geom_boxplot(show.legend = FALSE) +
     coord_flip() +
-    scale_fill_manual(values=rev(phenotype_colors[[i]])) +
+    scale_fill_manual(values=phenotype_colors[[i]]) +
     xlab(phenotype_annotation[i]) +
     ylab("Future total signaling entropy") +
     theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
