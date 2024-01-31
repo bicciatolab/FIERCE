@@ -732,6 +732,8 @@ perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_
     }
   }
 
+  cat("Removed temporary figures directory")
+
   if (adata_copy == TRUE) {
     return(adata)
   }
@@ -938,6 +940,8 @@ plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline
   move_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
   rename_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
 
+  cat("Removed temporary figures directory")
+  
   if (adata_copy==TRUE) {
     return(adata)
   }
@@ -1895,12 +1899,16 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
   sc$tl$pca(adata_temp, svd_solver='arpack')
 
-  if (!("pca_variance_ratio_entropy.pdf"%in%dir())) {
+  if (!("pca_variance_ratio_entropy.pdf"%in%dir(paste0(project_dir, "/UMAP_from_entropy")))) {
     sc$pl$pca_variance_ratio(adata_temp, log=TRUE, save='_entropy.pdf')
     move_plots(project_dir=project_dir, subfolder="UMAP_from_entropy")
   }
-  if ((plot_PCA_heatmap==TRUE) & !("pca_heatmap_entropy.pdf"%in%dir())) {
+  if ((plot_PCA_heatmap==TRUE) & !("pca_heatmap_entropy.pdf"%in%dir(paste0(project_dir, "/UMAP_from_entropy")))) {
+    if (dir.exists("figures") == FALSE) {
+      dir.create("figures")
+    }
     pca_heatmap(adata_temp, components=as.integer(ncol(adata_temp$obsm['X_pca'])), use_raw=NULL, filename="figures/pca_heatmap_entropy.pdf")
+    move_plots(project_dir=project_dir, subfolder="UMAP_from_entropy")
   }
 
   add_uns(adata, adata_temp$uns['pca'], 'pca_entropy')
@@ -1914,12 +1922,12 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
   cat("\n")
 
   if (is.null(color_as)) {
-    if (!("pca_entropy.pdf"%in%dir())) {
+    if (!("pca_entropy.pdf"%in%dir(paste0(project_dir, "/UMAP_from_entropy")))) {
       draw_embedding(adata, file_name="_entropy", emb='pca_entropy', legend_loc=legend_loc, alpha=alpha, add_outline=add_outline)
     }
   } else {
     for (i in 1:length(color_as)) {
-      if (!(paste0("pca_entropy_", color_as[i], ".pdf")%in%dir())) {
+      if (!(paste0("pca_entropy_", color_as[i], ".pdf")%in%dir(paste0(project_dir, "/UMAP_from_entropy")))) {
       if (class(adata$obs[color_as[i]][,color_as[i]]) %in% c("character","factor")) {
         c_type_i <- "categorical"
       } else if (class(adata$obs[color_as[i]][,color_as[i]]) %in% c("integer","numeric")) {
@@ -2004,19 +2012,19 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 
   for (i in n_pcs) {
 
-  if (dir.exists(paste0('n', as.character(j), 'pc', as.character(i))) == FALSE) {
-  dir.create(paste0('n', as.character(j), 'pc', as.character(i)))
+  if (dir.exists(paste0(project_dir, "/UMAP_from_entropy/", 'n', as.character(j), 'pc', as.character(i))) == FALSE) {
+  dir.create(paste0(project_dir, "/UMAP_from_entropy/", 'n', as.character(j), 'pc', as.character(i)))
   }
 
-  current_dir <- paste0('n', as.character(j), 'pc', as.character(i))
+  current_dir <- paste0(project_dir, "/UMAP_from_entropy/", 'n', as.character(j), 'pc', as.character(i))
 
   if (is.null(color_as)) {
-    if (!(paste0("umap_entropy_n", as.character(j), "pc", as.character(i), ".pdf")%in%dir())) {
+    if (!(paste0("umap_entropy_n", as.character(j), "pc", as.character(i), ".pdf")%in%dir(current_dir))) {
       draw_embedding(adata, file_name=paste0("_entropy_n", as.character(j), "pc", as.character(i)), emb=paste0('umap_entropy_n', as.character(j), 'pc', as.character(i)), legend_loc=legend_loc, alpha=alpha, add_outline=add_outline)
     }
   } else {
     for (k in 1:length(color_as)) {
-      if (!(paste0("umap_entropy_", color_as[k], "_n", as.character(j), "pc", as.character(i), ".pdf")%in%dir())) {
+      if (!(paste0("umap_entropy_", color_as[k], "_n", as.character(j), "pc", as.character(i), ".pdf")%in%dir(current_dir))) {
       if (class(adata$obs[color_as[k]][,color_as[k]]) %in% c("character","factor")) {
         c_type_i <- "categorical"
       } else if (class(adata$obs[color_as[k]][,color_as[k]]) %in% c("integer","numeric")) {
@@ -2036,11 +2044,13 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
       }
     }
   }
-  move_plots(project_dir=project_dir, subfolder=paste0("UMAP_from_entropy/", current_dir))
+  move_plots(project_dir=project_dir, subfolder=paste0("UMAP_from_entropy/", 'n', as.character(j), 'pc', as.character(i)))
 
   }
 
   }
+
+  cat("Removed temporary figures directory")
 
   if (adata_copy==TRUE) {
     return(adata)
@@ -2188,6 +2198,8 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
   move_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
   rename_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
 
+  cat("Removed temporary figures directory")
+  
   if (adata_copy==TRUE) {
     return(adata)
   }
