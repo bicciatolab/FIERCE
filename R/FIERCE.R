@@ -733,6 +733,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
   }
 
   cat("Removed temporary figures directory")
+  cat("\n")
 
   if (adata_copy == TRUE) {
     return(adata)
@@ -941,6 +942,7 @@ plot_velocity <- function(adata, project_dir="./FIERCE_results", sqrt_transform=
   rename_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
 
   cat("Removed temporary figures directory")
+  cat("\n")
   
   if (adata_copy==TRUE) {
     return(adata)
@@ -2051,6 +2053,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./FIERCE_results", n_neigh
   }
 
   cat("Removed temporary figures directory")
+  cat("\n")
 
   if (adata_copy==TRUE) {
     return(adata)
@@ -2199,6 +2202,7 @@ compute_graph_and_stream <- function(adata, project_dir="./FIERCE_results", only
   rename_plots(project_dir=project_dir, subfolder="velocity_field_streamplots")
 
   cat("Removed temporary figures directory")
+  cat("\n")
   
   if (adata_copy==TRUE) {
     return(adata)
