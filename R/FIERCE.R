@@ -363,7 +363,7 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 #' @description Performs a full Scanpy analysis (optional) pipeline on the expression matrix (slot "X") of the provided anndata object, from quality checks to clustering. By tuning the appropriate parameters, the user is free to personalize the analysis and perform only the desired operations
 #'
 #' @param adata anndata object
-#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The plots of the Scanpy pipeline will be saved in the "scanpy_preprocessing" sub-directory
+#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The plots of the Scanpy pipeline will be saved in the "scanpy_preprocessing" sub-directory
 #' @param min_genes minimum number of expressed genes required for a cell to be retained in the anndata object
 #' @param min_cells minimum number of expressing cells required for a gene to be retained in the anndata object
 #' @param compute_QC_metrics boolean; whether to compute quality metrics on cells. TRUE by default
@@ -432,7 +432,7 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 #' @export
 #'
 
-perform_preprocessing <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", min_genes=NULL, min_cells=NULL, compute_QC_metrics=TRUE, compute_MT_fraction=TRUE, MT_prefix='MT-', UMI_lower_thr=NULL, UMI_upper_thr=NULL, Gene_lower_thr=NULL, Gene_upper_thr=NULL, MTf_lower_thr=NULL, MTf_upper_thr=NULL, do_normalization=TRUE, target_sum_for_norm=1e4, do_log_transform=TRUE, cell_cycle_scoring=FALSE, s_genes=NULL, g2m_genes=NULL, find_HVGs=TRUE, min_mean_HVGs=0.0125, max_mean_HVGs=3, min_disp_HVGs=0.5, max_disp_HVGs=Inf, n_top_HVGs=NULL, flavor_HVGs='seurat', subset_HVGs=FALSE, perform_PCA=TRUE, plot_PCA_heatmap=TRUE, scale_data=TRUE, perform_regression=FALSE, regress_vars=NULL, compute_neighbor_graph=TRUE, n_neighbors=30, n_pcs=NULL, perform_clustering=TRUE, perform_UMAP=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, find_DEGs=TRUE, groups_for_DEGs=NULL, method_for_DEGs='wilcoxon', DEGs_to_show=25, adata_copy=FALSE) {
+perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_genes=NULL, min_cells=NULL, compute_QC_metrics=TRUE, compute_MT_fraction=TRUE, MT_prefix='MT-', UMI_lower_thr=NULL, UMI_upper_thr=NULL, Gene_lower_thr=NULL, Gene_upper_thr=NULL, MTf_lower_thr=NULL, MTf_upper_thr=NULL, do_normalization=TRUE, target_sum_for_norm=1e4, do_log_transform=TRUE, cell_cycle_scoring=FALSE, s_genes=NULL, g2m_genes=NULL, find_HVGs=TRUE, min_mean_HVGs=0.0125, max_mean_HVGs=3, min_disp_HVGs=0.5, max_disp_HVGs=Inf, n_top_HVGs=NULL, flavor_HVGs='seurat', subset_HVGs=FALSE, perform_PCA=TRUE, plot_PCA_heatmap=TRUE, scale_data=TRUE, perform_regression=FALSE, regress_vars=NULL, compute_neighbor_graph=TRUE, n_neighbors=30, n_pcs=NULL, perform_clustering=TRUE, perform_UMAP=TRUE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, find_DEGs=TRUE, groups_for_DEGs=NULL, method_for_DEGs='wilcoxon', DEGs_to_show=25, adata_copy=FALSE) {
   sc <- import("scanpy")
 
   if (dir.exists(project_dir) == FALSE) {
@@ -846,7 +846,7 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
 #' @description Computes the RNA velocity vector field and draws the streamplot on an embedding of choice
 #'
 #' @param adata anndata object containing the results of the "compute_velocity" function
-#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The streamplot will be saved in the "velocity_field_streamplots" sub-directory
+#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The streamplot will be saved in the "velocity_field_streamplots" sub-directory
 #' @param sqrt_transform boolean; whether to apply the variance-stabilizing transformation during transition probabilities computation. It helps to obtain a smoother streamplot. Default is TRUE
 #' @param embedding_basis name of the embedding to use for the streamplot. Default is "umap"
 #' @param force_graph_recalc whether to force the recalculation of the cell-cell transition probabilities matrix, if already present. Default is FALSE
@@ -874,7 +874,7 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
 #' @export
 #'
 
-plot_velocity <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", sqrt_transform=TRUE, embedding_basis='umap', force_graph_recalc=FALSE, compute_latent_time=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
+plot_velocity <- function(adata, project_dir="./FIERCE_results", sqrt_transform=TRUE, embedding_basis='umap', force_graph_recalc=FALSE, compute_latent_time=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
 
   if (check_layers(adata, "velocity")=="No") {
@@ -1444,7 +1444,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 #' @description Plots the results of "compute_signaling_entropy". Saves several plots that allow a visual check of the results of the SCENT analysis, namely: a boxplot of total entropies per phenotype label (for one or more phenitype annotations chosen by the user), a boxplot of the total number of expressed genes per phenotype, a boxplot of the mean expression level per phenotype, a boxplot of the median expression level per phenotype, a scatterplot of total entropies VS total number of expressed genes, a scatterplot of total entropies VS mean expression level, a scatterplot of total entropies VS median expression level, and a dotplot of the abundancies of potency states within each phenotype label. An ANOVA test is performed for each phenotype annotation used for the boxplots. Pearson correlations between total entropies, total number of expressed genes, mean and median gene expression are also computed and printed on screen
 #'
 #' @param adata anndata object containing the results of "compute_signaling_entropy"
-#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The plots will be saved in the "signaling_entropy_plots" sub-directory
+#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The plots will be saved in the "signaling_entropy_plots" sub-directory
 #' @param phenotype_annotation character vector containing the names of the cell annotations in the "obs" slot to visualize on the boxplot of the total entropies and on the dotplot of the potency states. Any number of columns can be specified
 #' @param phenotype_order optional; list containing, for each phenotype annotation specified in phenotype_annotation, a character vector specifying the order by which the respective phenotype labels should be plotted. If it is not necessary to specify a particular order for a specific annotation, just write NULL. If it is not necessary to specify any order for any annotation, do not change the default value of this parameter
 #' @param phenotype_colors optional; list containing, for each phenotype annotation specified in phenotype_annotation, a character vector specifying the colors for the respective phenotype labels. If it is not necessary to specify any color for a specific annotation, just write NULL; in this case, a default color palette will be used. If it is not necessary to specify any color for any annotation, do not change the default value of this parameter; in this case, annotations will be colored according either to a default palette, or to the colors that are already stored in the anndata object ("uns" slot)
@@ -1462,7 +1462,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
 #' @export
 #'
 
-plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", phenotype_annotation=NULL, phenotype_order=NULL, phenotype_colors=NULL, horizontal=FALSE) {
+plot_entropy_results <- function(adata, project_dir="./FIERCE_results", phenotype_annotation=NULL, phenotype_order=NULL, phenotype_colors=NULL, horizontal=FALSE) {
 
   if (dir.exists(project_dir)==FALSE) {
     dir.create(project_dir)
@@ -1544,7 +1544,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   sr.v.obs <- adata$obs['total_entropies_observed'][,'total_entropies_observed']
   sr.v.fut <- adata$obs['total_entropies_future'][,'total_entropies_future']
 
-  pdf(paste0(project_dir, "/signaling_entropy_plots/Boxplot_SR_per_phenotype.pdf"), useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Boxplot_entropy_per_phenotype.pdf"), useDingbats=FALSE)
   if (horizontal==FALSE) {
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
@@ -1660,9 +1660,9 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   dev.off()
 
   # scatterplot of expressed genes VS SR value
-  cat("Scatterplot expressed genes vs SR...")
+  cat("Scatterplot expressed genes vs entropy...")
   cat("\n")
-  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_expressed_genes_SR.pdf"), useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_expressed_genes_entropy.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(expressed_genes=expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = expressed_genes, y = observed_entropies, color = phenotypes)) +
@@ -1683,9 +1683,9 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
   dev.off()
 
-  cat("Scatterplot mean expression vs SR...")
+  cat("Scatterplot mean expression vs entropy...")
   cat("\n")
-  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_mean_expression_SR.pdf"), useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_mean_expression_entropy.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(mean_expression=mean.expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = mean_expression, y = observed_entropies, color = phenotypes)) +
@@ -1706,9 +1706,9 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   }
   dev.off()
 
-  cat("Scatterplot median expression vs SR...")
+  cat("Scatterplot median expression vs entropy...")
   cat("\n")
-  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_median_expression_SR.pdf"), useDingbats=FALSE)
+  pdf(paste0(project_dir, "/signaling_entropy_plots/Scatterplot_median_expression_entropy.pdf"), useDingbats=FALSE)
   for (i in 1:length(pheno.v)) {
     df_i <- data.frame(median_expression=median.expr.v, observed_entropies=sr.v.obs, phenotypes=pheno.v[[i]])
     print(ggplot(df_i, aes(x = median_expression, y = observed_entropies, color = phenotypes)) +
@@ -1733,19 +1733,19 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
   cat("\n")
 
   # compute the correlation between SR score and expressed genes
-  cat(paste0("Correlation between observed SR score and number of expressed genes: ", as.character(cor(sr.v.obs, expr.v))))
+  cat(paste0("Correlation between observed entropy score and number of expressed genes: ", as.character(cor(sr.v.obs, expr.v))))
   cat("\n")
-  cat(paste0("Correlation between future SR score and number of expressed genes: ", as.character(cor(sr.v.fut, expr.v))))
+  cat(paste0("Correlation between future entropy score and number of expressed genes: ", as.character(cor(sr.v.fut, expr.v))))
   cat("\n")
   # compute the correlation between SR score and mean of expressed genes
-  cat(paste0("Correlation between observed SR score and mean expression: ", as.character(cor(sr.v.obs, mean.expr.v))))
+  cat(paste0("Correlation between observed entropy score and mean expression: ", as.character(cor(sr.v.obs, mean.expr.v))))
   cat("\n")
-  cat(paste0("Correlation between future SR score and mean expression: ", as.character(cor(sr.v.fut, mean.expr.v))))
+  cat(paste0("Correlation between future entropy score and mean expression: ", as.character(cor(sr.v.fut, mean.expr.v))))
   cat("\n")
   # compute the correlation between SR score and median of expressed genes
-  cat(paste0("Correlation between observed SR score and median expression: ", as.character(cor(sr.v.obs, median.expr.v))))
+  cat(paste0("Correlation between observed entropy score and median expression: ", as.character(cor(sr.v.obs, median.expr.v))))
   cat("\n")
-  cat(paste0("Correlation between future SR score and median expression: ", as.character(cor(sr.v.fut, median.expr.v))))
+  cat(paste0("Correlation between future entropy score and median expression: ", as.character(cor(sr.v.fut, median.expr.v))))
   cat("\n")
 
   ## DOTPLOT ####
@@ -1814,7 +1814,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #' @description Computes UMAP embeddings from observed entropies with Scanpy. First, a PCA is performed directly on entropy values, then a nearest neighbor graph is computed from resulting PCs, and finally the UMAP embedding is built on the neighbor graph. Optionally, a clustering analysis is also performed on the neighbor graph. The user can specify any combination of PCs and neighbors for UMAP computation, the results will be saved into separate folders
 #'
 #' @param adata anndata object with "partial_entropies_observed" layer (produced by the "compute_signaling_entropy" function)
-#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The UMAP plots will be saved in the "UMAP_from_entropy" sub-directory, in separate folders for each combination of PCs and neighbors specified by the user
+#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The UMAP plots will be saved in the "UMAP_from_entropy" sub-directory, in separate folders for each combination of PCs and neighbors specified by the user
 #' @param n_neighbors number of nearest neighbors to compute for each cell in the nearest neighbor graph that will be used for UMAP embedding computation. If the user wishes to try different values for this parameter, an integer vector containing all the desired values can be specified (the results will be saved into dedicated folders). Default is 30 neighbors
 #' @param n_pcs number of PCs to consider for the nearest neighbor graph computation. If the user wishes to try different values for this parameter, an integer vector containing all the desired values can be specified (the results will be saved into dedicated folders). Default (NULL) is all the computed PCs (50). The PCs are computed directly from the observed entropies with the default PCA procedure of Scanpy
 #' @param plot_PCA_heatmap boolean; whether to plot the heatmap of the entropies of the most significant genes for each PC. Default is TRUE
@@ -1841,7 +1841,7 @@ plot_entropy_results <- function(adata, project_dir="./Velocity_of_the_entropy_p
 #'
 #'
 
-compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_pipeline", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, redo_from_scratch=FALSE, adata_copy=FALSE) {
+compute_entropy_UMAP <- function (adata, project_dir="./FIERCE_results", n_neighbors=30, n_pcs=NULL, plot_PCA_heatmap=TRUE, perform_clustering=FALSE, color_as=NULL, lab_order=NULL, palette=NULL, legend_loc="right margin", alpha=1, add_outline=FALSE, redo_from_scratch=FALSE, adata_copy=FALSE) {
   sc <- import("scanpy")
   ad <- import("anndata")
 
@@ -2063,7 +2063,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 #' @description Computes the cell-cell transition probabilites based on the correlation of the velocities of the entropy of each cell with the entropies of neighboring cells. Then, based on such probabilites, draws the streamplot on an embedding of choice (the default is UMAP). scVelo has been adapted to perform all the computation
 #'
 #' @param adata anndata object with "partial_entropies_observed" and "velocity_of_the_entropy" layers (produced by the "compute_signaling_entropy" function)
-#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The streamplot will be saved in the "velocity_field_streamplots" sub-directory
+#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The streamplot will be saved in the "velocity_field_streamplots" sub-directory
 #' @param only_velocity_genes boolean; whether only the genes that successfully fitted the velocity dynamical model ("compute_velocity" function) should be used for transition probabilities computation. Default is FALSE
 #' @param n_neighbors_graph this parameter, in combination with "n_pcs_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, the last graph computed by the "compute_entropy_UMAP" function will be used 
 #' @param n_pcs_graph this parameter, in combination with "n_neighbors_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, the last graph computed by the "compute_entropy_UMAP" function will be used
@@ -2103,7 +2103,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./Velocity_of_the_entropy_
 #'
 #'
 
-compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entropy_pipeline", only_velocity_genes=FALSE, n_neighbors_graph=NULL, n_pcs_graph=NULL, n_neighbors_emb=NULL, n_pcs_emb=NULL, sqrt_transform=TRUE, embedding_basis='umap_entropy', force_graph_recalc=TRUE, color_as='total_entropies_observed', lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
+compute_graph_and_stream <- function(adata, project_dir="./FIERCE_results", only_velocity_genes=FALSE, n_neighbors_graph=NULL, n_pcs_graph=NULL, n_neighbors_emb=NULL, n_pcs_emb=NULL, sqrt_transform=TRUE, embedding_basis='umap_entropy', force_graph_recalc=TRUE, color_as='total_entropies_observed', lab_order=NULL, palette=NULL, legend_loc='right margin', alpha=0.3, add_outline=TRUE, min_mass=4, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
 
   if (dir.exists(project_dir) == FALSE) {
@@ -2206,151 +2206,3 @@ compute_graph_and_stream <- function(adata, project_dir="./Velocity_of_the_entro
 }
 
 
-#' @title plot_signature_statistics
-#'
-#' @description Plots the phase portraits, the expression level, the partial entropy level, the RNA velocity and the velocity of the entropy of the genes that achieved the top likelihood score in the velocity dynamical model. Alternatively, the user can provide their own gene signature, that will be filtered to include only the subset of genes that successfully fitted the dynamical model. In any case, the genes will be plotted in decreasing order according to their likelihood score
-#'
-#' @param adata anndata object containing the results of "compute_velocity" and "compute_signaling_entropy"
-#' @param signature optional character vector containing the gene signature provided by the user
-#' @param signature_name if a gene signature is provided by the user, this name will be reported in the output file names
-#' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The plots will be saved in the "signature_statistics_plots" sub-directory
-#' @param use_raw boolean; whether RNA velocities and signaling entropies have been computed from the normalized counts instead of the first order moments (see documentation for "compute_velocity" and "compute_signaling_entropy" functions). This will affect the data that will be plotted as expression levels. Default is FALSE
-#' @param embedding_basis name of the embedding to use for plotting the expression level, the partial entropy level, the RNA velocity and the velocity of the entropy. Default is "umap_entropy"
-#' @param n_neighbors if "umap_entropy" is chosen as cell embedding for the scatterplots, this parameter, in combination with "n_pcs", specifies which embedding will be used among those that have been produced by the "compute_entropy_UMAP" function (stored in the "obsm" slot). If NULL (default), the first entropy-derived UMAP embedding stored in the "obsm" slot will be used
-#' @param n_pcs if "umap_entropy" is chosen as cell embedding for the scatterplots, this parameter, in combination with "n_neighbors", specifies which embedding will be used among those that have been produced by the "compute_entropy_UMAP" function (stored in the "obsm" slot). If NULL (default), the first entropy-derived UMAP embedding sotred in the "obsm" slot will be used
-#' @param color_as character vector containing the names of the cell annotations in the "obs" slot to visualize on the phase portraits. A distinct pdf file will be produced for each annotation
-#' @param lab_order optional; list containing, for each cell annotation specified in "color_as", a character vector specifying the order by which the respective labels should be printed in the legends of the phase portraits. If it is not necessary to specify a particular order for a specific annotation, just write NULL. If it is not necessary to specify any order for any annotation, do not change the default value of this parameter
-#' @param palette optional; list containing, for each cell annotation specified in "color_as", a character vector specifying the colors of the respective labels. If it is not necessary to specify any color for a specific annotation, just write NULL; in this case, a default color palette will be used. If it is not necessary to specify any color for any annotation, do not change the default value of this parameter; in this case, annotations will be colored according either to a default palette, or to the colors that are already stored in the anndata object ("uns" slot)
-#' @param n_genes number of top-likelihood genes that will be shown in the plots. By default (NULL), the 20 top genes will be plotted if the user does not provide any custom signature, otherwise all the genes of the signature that passed the likelihood threshold will be plotted
-#' @param legend_loc localization of the legend on the plots. Default is "right"
-#'
-#' @return No objects are returned, the plots will be saved in the directory containing the results of the main FIERCE analysis ("signature_statistics_plots" sub-directory)
-#'
-#' @examples
-#' #Plot the phase portraits, the expression level, the partial entropy level, the RNA velocity and the velocity of the entropy of the top 20 likelihood genes. The first entropy-derived UMAP embedding stored in the anndata object is used. In this example, the clusters, the cell types and the cell cycle phase are visualized on the phase portraits. A specific label order and a specific color for each label is specified for the cell cycle phase only.
-#'
-#' plot_signature_statistics(adata_velocity_entropy, color_as=c("clusters", "cell_types", "phase"), lab_order=list(NULL, NULL, c("G1","S","G2M")), palette=list(NULL, NULL, c("green", "red", "blue")))
-#'
-#' @exportPattern "^[[:alpha:]]+"
-#' @importFrom magrittr "%>%"
-#' @export
-#'
-#'
-
-plot_signature_statistics <- function(adata, signature=NULL, signature_name=NULL, project_dir="./Velocity_of_the_entropy_pipeline", use_raw=FALSE, embedding_basis='umap_entropy', n_neighbors=NULL, n_pcs=NULL, color_as=NULL, lab_order=NULL, palette=NULL, n_genes=NULL, legend_loc="right") {
-  sc <- import("scanpy")
-  current_wd <- getwd()
-  if (dir.exists(project_dir) == FALSE) {
-    dir.create(project_dir)
-  }
-  if (dir.exists(paste0(project_dir, "/signature_statistics_plots")) == FALSE) {
-    dir.create(paste0(project_dir, "/signature_statistics_plots"))
-  }
-  setwd(paste0(project_dir, "/signature_statistics_plots"))
-
-  if (!is.null(palette) & !is.list(palette)) {
-    stop("palette is not a list")
-  }
-
-  if (!is.null(lab_order) & !is.list(lab_order)) {
-    stop("lab_order is not a list")
-  }
-
-  if (!is.null(signature)) {
-    if (is.null(signature_name)) {
-      stop("No name provided for custom gene signature")
-    }
-    signature <- signature[signature %in% adata$var_names$tolist()[adata$var$velocity_genes==TRUE]]
-  } else {
-    signature <- adata$var_names$tolist()[adata$var$velocity_genes==TRUE]
-    signature_name <- "top_likelihood_genes"
-  }
-
-  likelihoods <- NULL
-  for (i in signature) {
-    likelihoods <- c(likelihoods, adata$var$fit_likelihood[adata$var_names$tolist() == i])
-  }
-  names(likelihoods) <- signature
-  likelihoods <- sort(likelihoods, decreasing=TRUE)
-
-  if (!is.null(signature) & is.null(n_genes)) {
-    n_genes <- length(signature)
-  }
-
-  if (is.null(signature) & is.null(n_genes)) {
-    n_genes <- 20
-  }
-
-  if (n_genes >= length(signature)) {
-    n_genes <- length(signature)
-  }
-
-  signature <- names(likelihoods[1:n_genes])
-
-
-  if (is.null(color_as)) {
-    phase_portraits(adata, var_names=signature, use_raw=use_raw, ncols=as.integer(1), save=paste0(signature_name, "_phase_portraits.pdf"))
-  } else {
-    for (i in 1:length(color_as)) {
-      if (class(adata$obs[color_as[i]][,color_as[i]]) %in% c("character","factor")) {
-        c_type_i <- "categorical"
-      } else {
-        c_type_i <- NULL
-      }
-      if (is.null(palette)) {
-        pal_i <- NULL
-      } else {
-        pal_i <- palette[[i]]
-      }
-      if (is.null(lab_order)) {
-        c_ord_i <- NULL
-      } else {
-        c_ord_i <- lab_order[[i]]
-      }
-      phase_portraits(adata, var_names=signature, use_raw=use_raw, color=color_as[i], c_type=c_type_i, pal=pal_i, c_ord=c_ord_i, ncols=as.integer(1), save=paste0(signature_name, "_phase_portraits_", color_as[i], ".pdf"))
-    }
-  }
-
-  if (is.null(n_pcs) | is.null(n_neighbors)) {
-    obsm_list <- extract_obsm_keys(adata)
-    first_obsm <- obsm_list[grep("X_umap_entropy",obsm_list)][1]
-    placeholder <- unlist(strsplit(first_obsm,split="_"))[length(unlist(strsplit(first_obsm,split="_")))]
-    placeholder <- unlist(strsplit(placeholder,split="n"))
-    n_neighbors <- placeholder[1]
-    n_pcs <- placeholder[2]
-  }
-  if (embedding_basis=="umap_entropy") {
-    embedding_basis <- paste0(embedding_basis, '_n', as.character(n_neighbors), 'pc', as.character(n_pcs))
-  }
-
-  if (use_raw==FALSE) {
-    layers <- c("Ms","velocity","partial_entropies_observed","velocity_of_the_entropy")
-  } else {
-    layers <- c("spliced","velocity","partial_entropies_observed","velocity_of_the_entropy")
-  }
-
-  for (layer_i in layers) {
-    if (layer_i=="velocity_of_the_entropy" | layer_i=="velocity") {
-      color_map <- "RdBu_r"
-    } else {
-      color_map <- NULL
-    }
-    plot_multiple_scatters(adata, embedding_basis=embedding_basis, genes=signature, layer=layer_i, color_map=color_map, legend_loc=legend_loc, filename=paste0(signature_name, "_scatterplots_", embedding_basis, "_", layer_i, ".pdf"))
-  }
-
-  for (i in dir("figures")) {
-    file.copy(paste0('./figures/', i), paste0('./', i), overwrite=TRUE)
-  }
-
-  unlink("figures", recursive=TRUE)
-
-  files_to_rename <- dir()[grep("scvelo_",dir())]
-
-  for (j in files_to_rename) {
-    new_name <- strsplit(j, split="scvelo_")[[1]][2]
-    file.rename(j, new_name)
-  }
-
-  setwd(current_wd)
-
-}
