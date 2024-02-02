@@ -6,7 +6,7 @@
 \usage{
 perform_preprocessing(
   adata,
-  project_dir = "./Velocity_of_the_entropy_pipeline",
+  project_dir = "./FIERCE_results",
   min_genes = NULL,
   min_cells = NULL,
   compute_QC_metrics = TRUE,
@@ -58,7 +58,7 @@ perform_preprocessing(
 \arguments{
 \item{adata}{anndata object}
 
-\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The plots of the Scanpy pipeline will be saved in the "scanpy_preprocessing" sub-directory}
+\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The plots of the Scanpy pipeline will be saved in the "scanpy_preprocessing" sub-directory}
 
 \item{min_genes}{minimum number of expressed genes required for a cell to be retained in the anndata object}
 

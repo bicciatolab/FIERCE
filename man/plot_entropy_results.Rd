@@ -6,7 +6,7 @@
 \usage{
 plot_entropy_results(
   adata,
-  project_dir = "./Velocity_of_the_entropy_pipeline",
+  project_dir = "./FIERCE_results",
   phenotype_annotation = NULL,
   phenotype_order = NULL,
   phenotype_colors = NULL,
@@ -16,7 +16,7 @@ plot_entropy_results(
 \arguments{
 \item{adata}{anndata object containing the results of "compute_signaling_entropy"}
 
-\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The plots will be saved in the "signaling_entropy_plots" sub-directory}
+\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The plots will be saved in the "signaling_entropy_plots" sub-directory}
 
 \item{phenotype_annotation}{character vector containing the names of the cell annotations in the "obs" slot to visualize on the boxplot of the total entropies and on the dotplot of the potency states. Any number of columns can be specified}
 

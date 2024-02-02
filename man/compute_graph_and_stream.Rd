@@ -6,7 +6,7 @@
 \usage{
 compute_graph_and_stream(
   adata,
-  project_dir = "./Velocity_of_the_entropy_pipeline",
+  project_dir = "./FIERCE_results",
   only_velocity_genes = FALSE,
   n_neighbors_graph = NULL,
   n_pcs_graph = NULL,
@@ -29,7 +29,7 @@ compute_graph_and_stream(
 \arguments{
 \item{adata}{anndata object with "partial_entropies_observed" and "velocity_of_the_entropy" layers (produced by the "compute_signaling_entropy" function)}
 
-\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The streamplot will be saved in the "velocity_field_streamplots" sub-directory}
+\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The streamplot will be saved in the "velocity_field_streamplots" sub-directory}
 
 \item{only_velocity_genes}{boolean; whether only the genes that successfully fitted the velocity dynamical model ("compute_velocity" function) should be used for transition probabilities computation. Default is FALSE}
 

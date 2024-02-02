@@ -6,7 +6,7 @@
 \usage{
 compute_entropy_UMAP(
   adata,
-  project_dir = "./Velocity_of_the_entropy_pipeline",
+  project_dir = "./FIERCE_results",
   n_neighbors = 30,
   n_pcs = NULL,
   plot_PCA_heatmap = TRUE,
@@ -24,7 +24,7 @@ compute_entropy_UMAP(
 \arguments{
 \item{adata}{anndata object with "partial_entropies_observed" layer (produced by the "compute_signaling_entropy" function)}
 
-\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The UMAP plots will be saved in the "UMAP_from_entropy" sub-directory, in separate folders for each combination of PCs and neighbors specified by the user}
+\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The UMAP plots will be saved in the "UMAP_from_entropy" sub-directory, in separate folders for each combination of PCs and neighbors specified by the user}
 
 \item{n_neighbors}{number of nearest neighbors to compute for each cell in the nearest neighbor graph that will be used for UMAP embedding computation. If the user wishes to try different values for this parameter, an integer vector containing all the desired values can be specified (the results will be saved into dedicated folders). Default is 30 neighbors}
 

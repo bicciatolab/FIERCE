@@ -6,7 +6,7 @@
 \usage{
 plot_velocity(
   adata,
-  project_dir = "./Velocity_of_the_entropy_pipeline",
+  project_dir = "./FIERCE_results",
   sqrt_transform = TRUE,
   embedding_basis = "umap",
   force_graph_recalc = FALSE,
@@ -25,7 +25,7 @@ plot_velocity(
 \arguments{
 \item{adata}{anndata object containing the results of the "compute_velocity" function}
 
-\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./Velocity_of_the_entropy_pipeline". The streamplot will be saved in the "velocity_field_streamplots" sub-directory}
+\item{project_dir}{name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The streamplot will be saved in the "velocity_field_streamplots" sub-directory}
 
 \item{sqrt_transform}{boolean; whether to apply the variance-stabilizing transformation during transition probabilities computation. It helps to obtain a smoother streamplot. Default is TRUE}
 
