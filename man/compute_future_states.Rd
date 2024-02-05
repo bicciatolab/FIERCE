@@ -16,6 +16,7 @@ compute_future_states(
   max_cells_u = NULL,
   min_shared_counts = NULL,
   min_shared_cells = NULL,
+  subset_genes = FALSE,
   retain_genes = NULL,
   n_pcs = NULL,
   n_neighbors = 30,
@@ -47,6 +48,8 @@ compute_future_states(
 \item{min_shared_counts}{minimum number of spliced OR unspliced counts required for a gene to be retained for velocity computation}
 
 \item{min_shared_cells}{minimum number of expressing cells (spliced OR unspliced counts) required for a gene to be retained for velocity computation}
+
+\item{subset_genes}{boolean; whether to subset the anndata object to retain only the genes used for velocity computation. FALSE by default}
 
 \item{retain_genes}{character vector containing a list of genes to be retained for velocity computation regardless of the filters}
 

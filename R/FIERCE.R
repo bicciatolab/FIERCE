@@ -569,7 +569,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
         sc$pp$scale(adata_PCA)
         sc$tl$pca(adata_PCA, svd_solver='arpack')
         if (plot_PCA_heatmap==TRUE) {
-          pca_heatmap(adata_PCA, components=as.integer(ncol(adata_PCA$obsm['X_pca'])), use_raw=NULL, layer=NULL)
+          pca_heatmap(adata_PCA, components=as.integer(ncol(adata_PCA$obsm['X_pca'])), use_raw=NULL, layer=NULL, filename=paste0(project_dir, "/scanpy_preprocessing/pca_heatmap.pdf"))
         }
 
         add_annotation_var(adata, adata_PCA$var['mean'], 'mean')
@@ -587,7 +587,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
         sc$pp$scale(adata)
         sc$tl$pca(adata, svd_solver='arpack')
         if (plot_PCA_heatmap==TRUE) {
-          pca_heatmap(adata, components=as.integer(ncol(adata$obsm['X_pca'])), use_raw=NULL, layer=NULL)
+          pca_heatmap(adata, components=as.integer(ncol(adata$obsm['X_pca'])), use_raw=NULL, layer=NULL, filename=paste0(project_dir, "/scanpy_preprocessing/pca_heatmap.pdf"))
         }
       }
     } else {
@@ -595,7 +595,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
         adata_PCA <- subset_anndata_genes(adata, adata$var['highly_variable']$highly_variable)
         sc$tl$pca(adata_PCA, svd_solver='arpack')
         if (plot_PCA_heatmap==TRUE) {
-          pca_heatmap(adata_PCA, components=as.integer(ncol(adata_PCA$obsm['X_pca'])), use_raw=NULL, layer=NULL)
+          pca_heatmap(adata_PCA, components=as.integer(ncol(adata_PCA$obsm['X_pca'])), use_raw=NULL, layer=NULL, filename=paste0(project_dir, "/scanpy_preprocessing/pca_heatmap.pdf"))
         }
 
         add_annotation_var(adata, adata_PCA$var['mean'], 'mean')
@@ -609,7 +609,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
       } else {
         sc$tl$pca(adata, svd_solver='arpack')
         if (plot_PCA_heatmap==TRUE) {
-          pca_heatmap(adata, components=as.integer(ncol(adata$obsm['X_pca'])), use_raw=NULL, layer=NULL)
+          pca_heatmap(adata, components=as.integer(ncol(adata$obsm['X_pca'])), use_raw=NULL, layer=NULL, filename=paste0(project_dir, "/scanpy_preprocessing/pca_heatmap.pdf"))
         }
       }
     }
@@ -756,6 +756,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
 #' @param max_cells_u maximum number of expressing cells (unspliced counts only) allowed for a gene to be retained for velocity computation
 #' @param min_shared_counts minimum number of spliced OR unspliced counts required for a gene to be retained for velocity computation
 #' @param min_shared_cells minimum number of expressing cells (spliced OR unspliced counts) required for a gene to be retained for velocity computation
+#' @param subset_genes boolean; whether to subset the anndata object to retain only the genes used for velocity computation. FALSE by default 
 #' @param retain_genes character vector containing a list of genes to be retained for velocity computation regardless of the filters
 #' @param n_pcs number of PCs to consider for the nearest neighbor graph computation (necessary for first order moments computation, skipped if use_raw=TRUE, or if the graph is already present)
 #' @param n_neighbors number of nearest neighbors to compute for each cell in the nearest neighbor graph (necessary for first order moments computation, skipped if use_raw=TRUE, or if the graph is already present). Default is 30 neighbors
@@ -785,7 +786,7 @@ perform_preprocessing <- function(adata, project_dir="./FIERCE_results", min_gen
 #' @export
 #'
 
-compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=FALSE) {
+compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_counts=NULL, max_cells=NULL, min_counts_u=NULL, min_cells_u=NULL, max_counts_u=NULL, max_cells_u=NULL, min_shared_counts=NULL, min_shared_cells=NULL, subset_genes=FALSE, retain_genes=NULL, n_pcs=NULL, n_neighbors=30, mode_moments='connectivities', use_raw=FALSE, n_cores=NULL, adata_copy=FALSE) {
   scv <- import("scvelo")
   if (adata_copy==TRUE) {
     adata = adata$copy()
@@ -798,22 +799,43 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
   for (i in 1:length(gene_filters)) {
     if (!is.null(gene_filters[[i]])) {
       gene_filters[[i]] <- as.integer(gene_filters[[i]])
+      there_filters <- TRUE
     }
   }
+  if (!exists("there_filters")) {
+    there_filters <- FALSE
+  }
 
-  scv$pp$filter_genes(adata, min_counts=gene_filters[[1]], min_cells=gene_filters[[2]], max_counts=gene_filters[[3]], max_cells=gene_filters[[4]], min_counts_u=gene_filters[[5]], min_cells_u=gene_filters[[6]], max_counts_u=gene_filters[[7]], max_cells_u=gene_filters[[8]], min_shared_counts=gene_filters[[9]], min_shared_cells=gene_filters[[10]], retain_genes=retain_genes)
+  if (there_filters==TRUE) {
+    if (subset_genes==TRUE) {
+      scv$pp$filter_genes(adata, min_counts=gene_filters[[1]], min_cells=gene_filters[[2]], max_counts=gene_filters[[3]], max_cells=gene_filters[[4]], min_counts_u=gene_filters[[5]], min_cells_u=gene_filters[[6]], max_counts_u=gene_filters[[7]], max_cells_u=gene_filters[[8]], min_shared_counts=gene_filters[[9]], min_shared_cells=gene_filters[[10]], retain_genes=retain_genes)
+    } else {
+      adata_temp <- adata$copy()
+      scv$pp$filter_genes(adata_temp, min_counts=gene_filters[[1]], min_cells=gene_filters[[2]], max_counts=gene_filters[[3]], max_cells=gene_filters[[4]], min_counts_u=gene_filters[[5]], min_cells_u=gene_filters[[6]], max_counts_u=gene_filters[[7]], max_cells_u=gene_filters[[8]], min_shared_counts=gene_filters[[9]], min_shared_cells=gene_filters[[10]], retain_genes=retain_genes)
+    }
+  }
   scv$pp$normalize_per_cell(adata)
 
   if (is.null(n_pcs)) {
     n_pcs <- ncol(adata$obsm['X_pca'])
   }
 
-  scv$pp$moments(adata, n_pcs=as.integer(n_pcs), n_neighbors=as.integer(n_neighbors), mode=mode_moments)
+  if (use_raw==FALSE) {
+    scv$pp$moments(adata, n_pcs=as.integer(n_pcs), n_neighbors=as.integer(n_neighbors), mode=mode_moments)
+  }
 
+  if (there_filters==TRUE) {
+    if (subset_genes==TRUE) {
+      genes_to_use <- "velocity_genes"
+    } else {
+      genes_to_use <- adata_temp$var_names$tolist()
+      rm(adata_temp)
+    }
+  }
   if (!is.null(n_cores)) {
     n_cores <- as.integer(n_cores)
   }
-  scv$tl$recover_dynamics(adata, use_raw=use_raw, n_jobs=n_cores)
+  scv$tl$recover_dynamics(adata, use_raw=use_raw, var_names=genes_to_use, n_jobs=n_cores)
   scv$tl$velocity(adata, mode='dynamical', use_raw=use_raw)
 
   if (use_raw==FALSE) {
