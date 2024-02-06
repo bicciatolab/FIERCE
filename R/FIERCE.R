@@ -1542,23 +1542,23 @@ plot_entropy_results <- function(adata, project_dir="./FIERCE_results", phenotyp
         phenotype_colors[[i]] <- stored_colors2
       }
     }
-  }
-
-  for (i in 1:length(phenotype_colors)) {
-    if (is.null(phenotype_colors[[i]])) {
-      if (check_uns(adata,paste0(phenotype_annotation[i], "_colors"))=="No") {
-        phenotype_colors[[i]] <- my_palette_extended[1:length(names(table(pheno.v[[i]])))]
-      } else {
-        stored_colors <- adata$uns[paste0(phenotype_annotation[i], "_colors")]
-        names(stored_colors) <- names(table(adata$obs[phenotype_annotation[i]][,phenotype_annotation[i]]))
-        stored_colors2 <- NULL
-        for (j in names(table(pheno.v[[i]]))) {
-          stored_colors2 <- c(stored_colors2, stored_colors[names(stored_colors)==j])
+  } else {
+    for (i in 1:length(phenotype_colors)) {
+      if (is.null(phenotype_colors[[i]])) {
+        if (check_uns(adata,paste0(phenotype_annotation[i], "_colors"))=="No") {
+          phenotype_colors[[i]] <- my_palette_extended[1:length(names(table(pheno.v[[i]])))]
+        } else {
+          stored_colors <- adata$uns[paste0(phenotype_annotation[i], "_colors")]
+          names(stored_colors) <- names(table(adata$obs[phenotype_annotation[i]][,phenotype_annotation[i]]))
+          stored_colors2 <- NULL
+          for (j in names(table(pheno.v[[i]]))) {
+            stored_colors2 <- c(stored_colors2, stored_colors[names(stored_colors)==j])
+          }
+          phenotype_colors[[i]] <- stored_colors2
         }
-        phenotype_colors[[i]] <- stored_colors2
+      } else {
+          phenotype_colors[[i]] <- rev(phenotype_colors[[i]])
       }
-    } else {
-        phenotype_colors[[i]] <- rev(phenotype_colors[[i]])
     }
   }
 
@@ -1818,6 +1818,9 @@ plot_entropy_results <- function(adata, project_dir="./FIERCE_results", phenotyp
     names(pheno.a[[i]]) <- phenotype_colors[[i]]
   }
 
+  print(phenotype_colors)
+  print(pheno.a)
+
   for (i in 1:length(phenotype_annotation)) {
     col_i <- NULL
     if (!is.null(phenotype_order) & !is.null(phenotype_order[[i]])) {
@@ -1828,6 +1831,7 @@ plot_entropy_results <- function(adata, project_dir="./FIERCE_results", phenotyp
     for (j in c_ord_i) {
       col_i <- c(col_i, names(pheno.a[[i]])[pheno.a[[i]]==j])
     }
+    print(col_i)
     set_annot_levels(adata, c_as=phenotype_annotation[i], c_ord=c_ord_i, pal=col_i)
   }
 
