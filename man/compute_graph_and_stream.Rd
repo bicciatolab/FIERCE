@@ -33,9 +33,9 @@ compute_graph_and_stream(
 
 \item{only_velocity_genes}{boolean; whether only the genes that successfully fitted the velocity dynamical model ("compute_velocity" function) should be used for transition probabilities computation. Default is FALSE}
 
-\item{n_neighbors_graph}{this parameter, in combination with "n_pcs_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, the last graph computed by the "compute_entropy_UMAP" function will be used}
+\item{n_neighbors_graph}{this parameter, in combination with "n_pcs_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, it has the same value of n_neighbors_emb}
 
-\item{n_pcs_graph}{this parameter, in combination with "n_neighbors_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, the last graph computed by the "compute_entropy_UMAP" function will be used}
+\item{n_pcs_graph}{this parameter, in combination with "n_neighbors_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, it has the same value of n_pcs_emb}
 
 \item{n_neighbors_emb}{if "umap_entropy" is chosen as cell embedding for the streamplot, this parameter, in combination with "n_pcs_emb", specifies which embedding will be used among those that have been produced by the "compute_entropy_UMAP" function (stored in the "obsm" slot). If NULL (default), the last computed embedding will be used}
 

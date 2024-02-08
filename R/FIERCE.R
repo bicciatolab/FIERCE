@@ -2094,8 +2094,8 @@ compute_entropy_UMAP <- function (adata, project_dir="./FIERCE_results", n_neigh
 #' @param adata anndata object with "partial_entropies_observed" and "velocity_of_the_entropy" layers (produced by the "compute_signaling_entropy" function)
 #' @param project_dir name of the directory containing the results of the main FIERCE analysis (including the path). If it does not exist, it will be created. The default name is "./FIERCE_results". The streamplot will be saved in the "velocity_field_streamplots" sub-directory
 #' @param only_velocity_genes boolean; whether only the genes that successfully fitted the velocity dynamical model ("compute_velocity" function) should be used for transition probabilities computation. Default is FALSE
-#' @param n_neighbors_graph this parameter, in combination with "n_pcs_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, the last graph computed by the "compute_entropy_UMAP" function will be used 
-#' @param n_pcs_graph this parameter, in combination with "n_neighbors_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, the last graph computed by the "compute_entropy_UMAP" function will be used
+#' @param n_neighbors_graph this parameter, in combination with "n_pcs_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, it has the same value of n_neighbors_emb 
+#' @param n_pcs_graph this parameter, in combination with "n_neighbors_graph", specifies which nearest neighbors graph will be used to compute the cell-cell transition probabilities on the entropy space. By default, it has the same value of n_pcs_emb
 #' @param n_neighbors_emb if "umap_entropy" is chosen as cell embedding for the streamplot, this parameter, in combination with "n_pcs_emb", specifies which embedding will be used among those that have been produced by the "compute_entropy_UMAP" function (stored in the "obsm" slot). If NULL (default), the last computed embedding will be used
 #' @param n_pcs_emb if "umap_entropy" is chosen as cell embedding for the streamplot, this parameter, in combination with "n_neighbors_emb", specifies which embedding will be used among those that have been produced by the "compute_entropy_UMAP" function (stored in the "obsm" slot). If NULL (default), the last computed embedding will be used
 #' @param sqrt_transform boolean; whether to apply the variance-stabilizing transformation during transition probabilities computation. It helps to obtain a smoother streamplot. Default is TRUE
@@ -2149,14 +2149,24 @@ compute_graph_and_stream <- function(adata, project_dir="./FIERCE_results", only
   cat("Now printing scVelo output messages...")
   cat("\n")
 
+  if (is.null(n_pcs_emb) | is.null(n_neighbors_emb)) {
+    obsm_list <- extract_obsm_keys(adata)
+    last_obsm <- obsm_list[grep("X_umap_entropy",obsm_list)][length(obsm_list[grep("X_umap_entropy",obsm_list)])]
+    placeholder <- unlist(strsplit(last_obsm,split="_"))[length(unlist(strsplit(last_obsm,split="_")))]
+    placeholder <- unlist(strsplit(placeholder,split="pc"))
+    placeholder <- unlist(strsplit(placeholder,split="n"))
+    n_neighbors_emb <- placeholder[2]
+    n_pcs_emb <- placeholder[3]
+  }
+
   if (force_graph_recalc==TRUE) {
 
   if (is.null(n_neighbors_graph)) {
-    n_neighbors_graph <- adata$uns['neighbors']['params']$n_neighbors
+    n_neighbors_graph <- n_neighbors_emb
   }
 
   if (is.null(n_pcs_graph)) {
-    n_pcs_graph <- ncol(adata$obsm['X_pca_entropy'])
+    n_pcs_graph <- n_pcs_emb
   }
 
   adata_temp <- adata$copy()
@@ -2179,16 +2189,6 @@ compute_graph_and_stream <- function(adata, project_dir="./FIERCE_results", only
   }
   scv$tl$velocity_graph(adata, gene_subset=gene_subset, vkey='velocity_of_the_entropy', xkey='partial_entropies_observed', sqrt_transform=sqrt_transform, n_jobs=n_cores)
 
-  }
-
-  if (is.null(n_pcs_emb) | is.null(n_neighbors_emb)) {
-    obsm_list <- extract_obsm_keys(adata)
-    last_obsm <- obsm_list[grep("X_umap_entropy",obsm_list)][length(obsm_list[grep("X_umap_entropy",obsm_list)])]
-    placeholder <- unlist(strsplit(last_obsm,split="_"))[length(unlist(strsplit(last_obsm,split="_")))]
-    placeholder <- unlist(strsplit(placeholder,split="pc"))
-    placeholder <- unlist(strsplit(placeholder,split="n"))
-    n_neighbors_emb <- placeholder[2]
-    n_pcs_emb <- placeholder[3]
   }
 
   if (!is.null(palette) & !is.list(palette)) {
