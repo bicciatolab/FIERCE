@@ -2,7 +2,7 @@
 
 #### Contact:
 
-mattia.forcato@unimore.it; luca.calderoni@unimore.it
+silvio.bicciato@unipd.it; mattia.forcato.1@unipd.it; luca.calderoni@unipd.it
 
 #### Citation:
 
@@ -11,9 +11,8 @@ L. Calderoni, F. Grandi, S. Bicciato, O. Romano and M. Forcato
 # Table of Contents
 
 - [System requirements](https://github.com/bicciatolab/FIERCE#system-requirements)
-- [Installation Python packages](https://github.com/bicciatolab/FIERCE#install-python-packages)
-- [Installation in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r)
-- [Tutorial on example data](https://github.com/bicciatolab/FIERCE/main/docs/FIERCE_tutorial.html)
+- [Installation](https://github.com/bicciatolab/FIERCE#installation)
+- [Tutorial on test dataset](https://github.com/bicciatolab/FIERCE#tutorial-on-test-dataset)
 
 ## System requirements
 
@@ -145,3 +144,7 @@ or
 ```bash
 source /path/to/Installation/file/FIERCE_istallation.sh
 ```
+
+## Tutorial on test dataset
+
+https://github.com/bicciatolab/FIERCE/main/docs/tutorial_pancreas.html
