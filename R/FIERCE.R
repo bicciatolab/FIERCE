@@ -842,18 +842,18 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
   add_layer(adata, adata$layers['velocity'], 'velocity', transpose=FALSE, compress=TRUE)
 
   if (use_raw==FALSE) {
-    Ms_observed <- adata$layers['Ms']
+    Ms_observed <- as.matrix(adata$layers['Ms']$todense())
 
-    Ms_velocity <- adata$layers['velocity']
+    Ms_velocity <- as.matrix(adata$layers['velocity']$todense())
     Ms_velocity[is.nan(Ms_velocity)] <- 0
 
     Ms_future <- Ms_observed + Ms_velocity
 
-    add_layer(adata, Ms_future, "Ms_future", transpose=FALSE, compress=FALSE)
+    add_layer(adata, Ms_future, "Ms_future", transpose=FALSE, compress=TRUE)
   } else {
     spliced_observed <- as.matrix(adata$layers['spliced']$todense())
 
-    spliced_velocity <- adata$layers['velocity']
+    spliced_velocity <- as.matrix(adata$layers['velocity']$todense())
     spliced_velocity[is.nan(spliced_velocity)] <- 0
 
     spliced_future <- spliced_observed + spliced_velocity
