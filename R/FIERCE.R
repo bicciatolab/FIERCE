@@ -822,6 +822,8 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
 
   if (use_raw==FALSE) {
     scv$pp$moments(adata, n_pcs=as.integer(n_pcs), n_neighbors=as.integer(n_neighbors), mode=mode_moments)
+    add_layer(adata, adata$layers['Ms'], 'Ms', transpose=FALSE, compress=TRUE)
+    add_layer(adata, adata$layers['Mu'], 'Mu', transpose=FALSE, compress=TRUE)
   }
 
   if (there_filters==TRUE) {
@@ -837,6 +839,7 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
   }
   scv$tl$recover_dynamics(adata, use_raw=use_raw, var_names=genes_to_use, n_jobs=n_cores)
   scv$tl$velocity(adata, mode='dynamical', use_raw=use_raw)
+  add_layer(adata, adata$layers['velocity'], 'velocity', transpose=FALSE, compress=TRUE)
 
   if (use_raw==FALSE) {
     Ms_observed <- adata$layers['Ms']
