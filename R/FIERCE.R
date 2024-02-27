@@ -1016,7 +1016,7 @@ plot_velocity <- function(adata, project_dir="./FIERCE_results", sqrt_transform=
 #' @export
 #'
 
-compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_matrix=TRUE, use_original_SCENT_network=FALSE, most_recent_network=TRUE, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", user_network=NULL, n_cores=1, batch_size=5000, compute_potency_states=FALSE, phenotype_annotation=NULL, potency_states_only_mode="off", debug_mode=FALSE, adata_copy=FALSE) {
+compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_matrix=TRUE, use_original_SCENT_network=FALSE, most_recent_network=TRUE, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", user_network=NULL, n_cores=1, batch_size=5000, compute_potency_states=FALSE, phenotype_annotation=NULL, potency_states_only_mode="off", adata_copy=FALSE) {
   if (is.null(adata)) {
     stop("Please provide an anndata object")
   }
@@ -1042,7 +1042,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     cat("\n")
 
     if (use_raw==FALSE) {
-      input_matrix_obs <- adata$layers['Ms']
+      input_matrix_obs <- as.matrix(adata$layers['Ms']$todense())
     } else {
       input_matrix_obs <- as.matrix(adata$layers['spliced']$todense())
     }
@@ -1057,7 +1057,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
       input_matrix_obs <- input_matrix_obs+0.1
     }
 
-    add_layer(adata, input_matrix_obs, "SCENT_input_matrix_observed", transpose=TRUE, compress=FALSE)
+    add_layer(adata, input_matrix_obs, "SCENT_input_matrix_observed", transpose=TRUE, compress=TRUE)
 
   } else {
     cat("Observed input matrix already computed")
@@ -1070,7 +1070,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     cat("\n")
 
     if (use_raw==FALSE) {
-      input_matrix_fut <- adata$layers['Ms_future']
+      input_matrix_fut <- as.matrix(adata$layers['Ms_future']$todense())
     } else {
       input_matrix_fut <- as.matrix(adata$layers['spliced_future']$todense())
     }
@@ -1085,7 +1085,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
       input_matrix_fut <- input_matrix_fut+0.1
     }
 
-    add_layer(adata, input_matrix_fut, "SCENT_input_matrix_future", transpose=TRUE, compress=FALSE)
+    add_layer(adata, input_matrix_fut, "SCENT_input_matrix_future", transpose=TRUE, compress=TRUE)
 
   } else {
     cat("Future input matrix already computed")
@@ -1170,10 +1170,10 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     network <- user_network
   }
 
-  if (debug_mode==TRUE) {
-    print(ppi_net)
-    return(network)
-  }
+#  if (debug_mode==TRUE) {
+#    print(ppi_net)
+#    return(network)
+#  }
 
   ####################
   ##### Observed #####
@@ -1183,13 +1183,13 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   cat("Integrating observed input matrix with PPI network...")
   cat("\n")
   if (!exists("input_matrix_obs")) {
-    input_matrix_obs <- t(adata$layers['SCENT_input_matrix_observed'])
+    input_matrix_obs <- t(as.matrix(adata$layers['SCENT_input_matrix_observed']$todense()))
     rownames(input_matrix_obs) <- adata$var_names$tolist()
     colnames(input_matrix_obs) <- adata$obs_names$tolist()
   }
   integ.l.obs <- DoIntegPPI(exp.m = input_matrix_obs, ppiA.m = network)
   adata <- subset_anndata_genes(adata, rownames(integ.l.obs$expMC), adata_copy=FALSE)
-  add_layer(adata, integ.l.obs$expMC, "SCENT_integrated_matrix_observed", transpose=TRUE, compress=FALSE)
+  add_layer(adata, integ.l.obs$expMC, "SCENT_integrated_matrix_observed", transpose=TRUE, compress=TRUE)
   add_uns(adata, integ.l.obs$adjMC, "SCENT_maximally_connected_subnetwork_observed", nested=FALSE, sub_slot=NULL)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
@@ -1206,7 +1206,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   cat("Computing observed entropies (this could take a while)...")
   cat("\n")
   if (!exists("integ.l.obs")) {
-    expMC <- t(adata$layers['SCENT_integrated_matrix_observed'])
+    expMC <- t(as.matrix(adata$layers['SCENT_integrated_matrix_observed']$todense()))
     rownames(expMC) <- adata$var_names$tolist()
     colnames(expMC) <- adata$obs_names$tolist()
     adjMC <- adata$uns['SCENT_maximally_connected_subnetwork_observed']
@@ -1217,9 +1217,9 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if (length(adata$obs_names$tolist())<=batch_size) {
   sr.o.obs <- CompSRana(integ.l.obs, local = TRUE, mc.cores = n_cores)
   add_annotation_obs(adata, sr.o.obs$SR, "total_entropies_observed")
-  add_layer(adata, sr.o.obs$inv, "invariant_measure_observed", transpose=TRUE, compress=FALSE)
-  add_layer(adata, sr.o.obs$locS, "partial_entropies_observed_unnormalized", transpose=TRUE, compress=FALSE)
-  add_layer(adata, sr.o.obs$nlocS, "partial_entropies_observed", transpose=TRUE, compress=FALSE)
+  add_layer(adata, sr.o.obs$inv, "invariant_measure_observed", transpose=TRUE, compress=TRUE)
+  add_layer(adata, sr.o.obs$locS, "partial_entropies_observed_unnormalized", transpose=TRUE, compress=TRUE)
+  add_layer(adata, sr.o.obs$nlocS, "partial_entropies_observed", transpose=TRUE, compress=TRUE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
@@ -1253,9 +1253,9 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     shelf$sync()
   }
   add_annotation_obs(adata, shelf["total_entropies_observed"], "total_entropies_observed")
-  add_layer(adata, shelf["invariant_measure_observed"], "invariant_measure_observed", transpose=TRUE, compress=FALSE)
-  add_layer(adata, shelf["partial_entropies_observed_unnormalized"], "partial_entropies_observed_unnormalized", transpose=TRUE, compress=FALSE)
-  add_layer(adata, shelf["partial_entropies_observed"], "partial_entropies_observed", transpose=TRUE, compress=FALSE)
+  add_layer(adata, shelf["invariant_measure_observed"], "invariant_measure_observed", transpose=TRUE, compress=TRUE)
+  add_layer(adata, shelf["partial_entropies_observed_unnormalized"], "partial_entropies_observed_unnormalized", transpose=TRUE, compress=TRUE)
+  add_layer(adata, shelf["partial_entropies_observed"], "partial_entropies_observed", transpose=TRUE, compress=TRUE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
@@ -1296,12 +1296,12 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   cat("Integrating future input matrix with PPI network...")
   cat("\n")
   if (!exists("input_matrix_fut")) {
-    input_matrix_fut <- t(adata$layers['SCENT_input_matrix_future'])
+    input_matrix_fut <- t(as.matrix(adata$layers['SCENT_input_matrix_future']$todense()))
     rownames(input_matrix_fut) <- adata$var_names$tolist()
     colnames(input_matrix_fut) <- adata$obs_names$tolist()
   }
   integ.l.fut <- DoIntegPPI(exp.m = input_matrix_fut, ppiA.m = network)
-  add_layer(adata, integ.l.fut$expMC, "SCENT_integrated_matrix_future", transpose=TRUE, compress=FALSE)
+  add_layer(adata, integ.l.fut$expMC, "SCENT_integrated_matrix_future", transpose=TRUE, compress=TRUE)
   add_uns(adata, integ.l.fut$adjMC, "SCENT_maximally_connected_subnetwork_future", nested=FALSE, sub_slot=NULL)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
@@ -1318,7 +1318,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   cat("Computing future entropies (this could take a while)...")
   cat("\n")
   if (!exists("integ.l.fut")) {
-    expMC <- t(adata$layers['SCENT_integrated_matrix_future'])
+    expMC <- t(as.matrix(adata$layers['SCENT_integrated_matrix_future']$todense()))
     rownames(expMC) <- adata$var_names$tolist()
     colnames(expMC) <- adata$obs_names$tolist()
     adjMC <- adata$uns['SCENT_maximally_connected_subnetwork_future']
@@ -1329,9 +1329,9 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if (length(adata$obs_names$tolist())<=batch_size) {
   sr.o.fut <- CompSRana(integ.l.fut, local = TRUE, mc.cores = n_cores)
   add_annotation_obs(adata, sr.o.fut$SR, "total_entropies_future")
-  add_layer(adata, sr.o.fut$inv, "invariant_measure_future", transpose=TRUE, compress=FALSE)
-  add_layer(adata, sr.o.fut$locS, "partial_entropies_future_unnormalized", transpose=TRUE, compress=FALSE)
-  add_layer(adata, sr.o.fut$nlocS, "partial_entropies_future", transpose=TRUE, compress=FALSE)
+  add_layer(adata, sr.o.fut$inv, "invariant_measure_future", transpose=TRUE, compress=TRUE)
+  add_layer(adata, sr.o.fut$locS, "partial_entropies_future_unnormalized", transpose=TRUE, compress=TRUE)
+  add_layer(adata, sr.o.fut$nlocS, "partial_entropies_future", transpose=TRUE, compress=TRUE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
@@ -1365,9 +1365,9 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     shelf$sync()
   }
   add_annotation_obs(adata, shelf["total_entropies_future"], "total_entropies_future")
-  add_layer(adata, shelf["invariant_measure_future"], "invariant_measure_future", transpose=TRUE, compress=FALSE)
-  add_layer(adata, shelf["partial_entropies_future_unnormalized"], "partial_entropies_future_unnormalized", transpose=TRUE, compress=FALSE)
-  add_layer(adata, shelf["partial_entropies_future"], "partial_entropies_future", transpose=TRUE, compress=FALSE)
+  add_layer(adata, shelf["invariant_measure_future"], "invariant_measure_future", transpose=TRUE, compress=TRUE)
+  add_layer(adata, shelf["partial_entropies_future_unnormalized"], "partial_entropies_future_unnormalized", transpose=TRUE, compress=TRUE)
+  add_layer(adata, shelf["partial_entropies_future"], "partial_entropies_future", transpose=TRUE, compress=TRUE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
@@ -1407,8 +1407,8 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if (check_layers(adata, "velocity_of_the_entropy")=="No") {
   cat("Computing velocity of the entropy...")
   cat("\n")
-  velent <- adata$layers['partial_entropies_future'] - adata$layers['partial_entropies_observed']
-  add_layer(adata, velent, "velocity_of_the_entropy", transpose=FALSE, compress=FALSE)
+  velent <- as.matrix(adata$layers['partial_entropies_future']$todense()) - as.matrix(adata$layers['partial_entropies_observed']$todense())
+  add_layer(adata, velent, "velocity_of_the_entropy", transpose=FALSE, compress=TRUE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
   }
@@ -1916,7 +1916,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./FIERCE_results", n_neigh
 
   if (check_uns(adata, 'pca_entropy')=="No") {
 
-  entropies_matrix <- adata$layers['partial_entropies_observed']
+  entropies_matrix <- as.matrix(adata$layers['partial_entropies_observed']$todense())
   rownames(entropies_matrix) <- adata$obs_names$tolist()
   colnames(entropies_matrix) <- adata$var_names$tolist()
   adata_temp <- ad$AnnData(entropies_matrix)
@@ -1991,7 +1991,7 @@ compute_entropy_UMAP <- function (adata, project_dir="./FIERCE_results", n_neigh
   cat("Performing UMAP...")
   cat("\n")
 
-  entropies_matrix <- adata$layers['partial_entropies_observed']
+  entropies_matrix <- as.matrix(adata$layers['partial_entropies_observed']$todense())
   rownames(entropies_matrix) <- adata$obs_names$tolist()
   colnames(entropies_matrix) <- adata$var_names$tolist()
   adata_temp <- ad$AnnData(entropies_matrix)
