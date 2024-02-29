@@ -820,6 +820,7 @@ compute_future_states <- function (adata, min_counts=NULL, min_cells=NULL, max_c
   scv$tl$recover_dynamics(adata, use_raw=use_raw, n_jobs=n_cores)
   scv$tl$velocity(adata, mode='dynamical', use_raw=use_raw)
   add_layer(adata, adata$layers['velocity'], 'velocity', transpose=FALSE, compress=TRUE)
+  add_layer(adata, adata$layers['velocity_u'], 'velocity_u', transpose=FALSE, compress=TRUE)
 
   if (use_raw==FALSE) {
     Ms_observed <- as.matrix(adata$layers['Ms']$todense())
@@ -1438,7 +1439,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     shelf$close()
     cat("Removing temporary python dictionary...")
     cat("\n")
-#    unlink(dir()[grep("temp_shelf", dir())])
+    unlink(dir()[grep("temp_shelf", dir())])
   }
 
   if (adata_copy==TRUE) {
