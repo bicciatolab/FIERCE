@@ -200,6 +200,10 @@ def pca_heatmap(adata, components, use_raw=None, layer=None, filename="pca_heatm
 
 
 def draw_embedding(adata, file_name, emb='umap', stream=False, c_as=None, c_type=None, pal=None, c_ord=None, vkey='velocity_of_the_entropy', legend_loc="right margin", alpha=0.3, min_mass=4, add_outline=False, outline_width=(0.1, 0.01)):
+	if vkey=='velocity_of_the_entropy':
+		adata.layers['velocity_of_the_entropy'] = adata.layers['velocity_of_the_entropy'].todense()
+	elif vkey=='velocity':
+		adata.layers['velocity'] = adata.layers['velocity'].todense()
 #	from matplotlib.backends.backend_pdf import PdfPages
 	if ((c_as is not None) and (c_type == 'categorical')):
 		if c_ord is not None:
@@ -268,6 +272,11 @@ def draw_embedding(adata, file_name, emb='umap', stream=False, c_as=None, c_type
 		if legend_loc!="on data":
 			plt.rcParams.update({'legend.loc':legend_loc})
 		scv.pl.velocity_embedding_stream(adata, vkey=vkey, basis=emb, color=c_as, ncols=1, legend_loc=legend_loc, save=str(file_name+'.png'), alpha=alpha, min_mass=min_mass, size=2*round(120000/len(adata.obs_names.tolist())), add_outline=add_outline, outline_width=outline_width, dpi=500, color_map=colmap)
+	from scipy import sparse
+	if vkey=='velocity_of_the_entropy':
+		adata.layers['velocity_of_the_entropy'] = sparse.csc_matrix(adata.layers['velocity_of_the_entropy'])
+	elif vkey=='velocity':
+		adata.layers['velocity'] = sparse.csc_matrix(adata.layers['velocity'])
 
 
 def set_annot_levels(adata, c_as, c_ord, pal=None):
