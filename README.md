@@ -77,7 +77,7 @@ Once attached the environment, use the following lines of code on your terminal 
 ```python
 python -m pip install cython
 #pip3 install Cython==0.29.32 
-pip3 install velocyto==0.17.17 scvelo==0.2.4 scikit-learn==1.1.3
+pip3 install velocyto==0.17.17 scvelo==0.3.2 scikit-learn==1.1.3
 ```
 
 Since not all required R packages are provided by anaconda.org, some packages must be directly installed on the console, as described in [install packages in R](https://github.com/bicciatolab/FIERCE#install-packages-in-r).
