@@ -1,10 +1,10 @@
 Package: FIERCE
 Type: Package
 Title: Framework for InfERence of veloCity of the Entropy
-Version: 0.1.0
+Version: 1.0.0
 Author: Luca Calderoni, Francesco Grandi, Silvio Bicciato, Oriana Romano and Mattia Forcato  
 Maintainer: Luca Calderoni <luca.calderoni@unimore.it> Francesco Grandi <francesco.grandi1993@unimore.it>
-Description: ...............
+Description: FIERCE (Framework for InfERence of veloCity of the Entropy) is a computational pipeline that reconstructs cell differentiation trajectories from scRNA-seq data using the velocity framework to predict the future dynamics of transcriptional entropies in single cells
 License: GPL3
 Encoding: UTF-8
 Depends:

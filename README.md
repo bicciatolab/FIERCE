@@ -147,4 +147,4 @@ source /path/to/Installation/file/FIERCE_istallation.sh
 
 ## Tutorial on test dataset
 
-https://lucacalderoni.github.io/FIERCE_tutorial_pancreas/tutorial_pancreas.html
+https://raw.githack.com/bicciatolab/FIERCE/main/docs/tutorial_pancreas.html
