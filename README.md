@@ -147,4 +147,4 @@ source /path/to/Installation/file/FIERCE_istallation.sh
 
 ## Tutorial on test dataset
 
-https://rawcdn.githack.com/bicciatolab/FIERCE/6a22d9ee402f0941c7ff131fcbf5f23a821abd85/docs/tutorial_pancreas.html
+[FIERCE - Guided tutorial on scRNA-seq data of the murine pancreas endocrinogenesis](https://rawcdn.githack.com/bicciatolab/FIERCE/6a22d9ee402f0941c7ff131fcbf5f23a821abd85/docs/tutorial_pancreas.html)
