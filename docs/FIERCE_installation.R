@@ -17,20 +17,5 @@ for (i in 1:length(BioCdep)) {
 if(!"qlcMatrix"%in% installed.packages()[,"Package"]){devtools::install_github("cysouw/qlcMatrix")}
 devtools::install_github("aet21/SCENT")
 
-devtools::install_github(
-  "bicciatolab/FIERCE",
-  ref = "HEAD",
-  subdir = NULL,
-  auth_token = "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",
-  host = "api.github.com",
-  dependencies = NA,
-  upgrade = c("default", "ask", "always", "never"),
-  force = FALSE,
-  quiet = FALSE,
-  build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
-  build_manual = FALSE,
-  build_vignettes = FALSE,
-  repos = getOption("repos"),
-  type = getOption("pkgType")
-)
+devtools::install_github("bicciatolab/FIERCE")
+
