@@ -255,11 +255,17 @@ build_adata_object <- function(loom_file=NULL, adata_object=NULL, Seurat_object=
 
     if (!is.null(Seurat_cellnames_prefix)) {
       for (i in Seurat_cellnames_prefix) {
+        if (length(grep(i, new_cell_names))==0) {
+			    stop(paste0(i, " is an invalid cellname prefix"))
+		    }
         new_cell_names <- gsub(i, "", new_cell_names)
       }
     }
     if (!is.null(Seurat_cellnames_suffix)) {
       for (i in Seurat_cellnames_suffix) {
+        if (length(grep(i, new_cell_names))==0) {
+			    stop(paste0(i, " is an invalid cellname suffix"))
+		    }
         new_cell_names <- gsub(i, "x", new_cell_names)
       }
     }
