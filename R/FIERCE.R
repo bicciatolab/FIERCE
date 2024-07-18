@@ -1266,7 +1266,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     if(adata_copy==FALSE) {
       assign(h, adata, envir=.GlobalEnv)
     }
-  } else {
+  } else if ((compute_potency_states==TRUE) & ("Potency_states_observed" %in% names(adata$obs))) {
     cat("Observed potency states already computed")
     cat("\n")
   }
@@ -1378,7 +1378,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     if(adata_copy==FALSE) {
       assign(h, adata, envir=.GlobalEnv)
     }
-  } else {
+  } else if ((compute_potency_states==TRUE) & ("Potency_states_future" %in% names(adata$obs))) {
     cat("Future potency states already computed")
     cat("\n")
   }
