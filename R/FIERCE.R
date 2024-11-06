@@ -977,6 +977,7 @@ plot_velocity <- function(adata, project_dir="./FIERCE_results", sqrt_transform=
 #' @param compute_potency_states boolean; whether to compute observed and future potency states by combining the distribution of total entropies with a pre-computed phenotype annotation. Default is FALSE
 #' @param phenotype_annotation only used if compute_potency_states=TRUE; name of the cell annotation in the "obs" slot to combine with the distribution of total entropies for potency states computation
 #' @param potency_states_only_mode if this mode is "on", only the potency states are computed from pre-existing entropy scores that are already stored in the anndata object. Very useful if the user wishes to try different phenotype annotations for potency states computation. Default is "off", change to "on" to activate
+#' @param extensive_output if TRUE, include the complete output of the SCENT algorithm (including data that are not necessary for velocity of the entropy computation; for more info, please see the SCENT documentation). Default is FALSE to save space
 #' @param adata_copy boolean; if TRUE, create a new anndata object with the results of the analysis; if FALSE, update the provided anndata object. Default is FALSE
 #'
 #' @return If adata_copy=TRUE, a new anndata object with the results of the analysis will be returned. Otherwise (default), the provided anndata object will be updated with the results of the analysis. In both cases, the matrix of the velocities of the entropy and the matrices of the partial entropies (both observed and future) will be saved as additional layers
@@ -999,7 +1000,7 @@ plot_velocity <- function(adata, project_dir="./FIERCE_results", sqrt_transform=
 #' @export
 #'
 
-compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_matrix=TRUE, use_original_SCENT_network=FALSE, most_recent_network=TRUE, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", user_network=NULL, n_cores=1, batch_size=5000, compute_potency_states=FALSE, phenotype_annotation=NULL, potency_states_only_mode="off", debug_mode=FALSE, adata_copy=FALSE) {
+compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_matrix=TRUE, use_original_SCENT_network=FALSE, most_recent_network=TRUE, use_builtin_network=TRUE, species="Human", network_nomenclature="gene_symbol", network_threshold="high", user_network=NULL, n_cores=1, batch_size=5000, compute_potency_states=FALSE, phenotype_annotation=NULL, potency_states_only_mode="off", debug_mode=FALSE, extensive_output=FALSE, adata_copy=FALSE) {
   if (is.null(adata)) {
     stop("Please provide an anndata object")
   }
@@ -1200,8 +1201,10 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if (length(adata$obs_names$tolist())<=batch_size) {
   sr.o.obs <- CompSRana(integ.l.obs, local = TRUE, mc.cores = n_cores)
   add_annotation_obs(adata, sr.o.obs$SR, "total_entropies_observed")
-  add_layer(adata, sr.o.obs$inv, "invariant_measure_observed", transpose=TRUE, compress=FALSE)
-  add_layer(adata, sr.o.obs$locS, "partial_entropies_observed_unnormalized", transpose=TRUE, compress=FALSE)
+  if (extensive_output==TRUE) {
+    add_layer(adata, sr.o.obs$inv, "invariant_measure_observed", transpose=TRUE, compress=FALSE)
+    add_layer(adata, sr.o.obs$locS, "partial_entropies_observed_unnormalized", transpose=TRUE, compress=FALSE)
+  }
   add_layer(adata, sr.o.obs$nlocS, "partial_entropies_observed", transpose=TRUE, compress=FALSE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
@@ -1224,20 +1227,26 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     }
     if (key_in_shelf(shelf, "partial_entropies_observed")=="yes") {
       add_shelves(shelf, "total_entropies_observed", c(shelf['total_entropies_observed'], sr.o.obs$SR))
-      add_shelves(shelf, "invariant_measure_observed", cbind(shelf['invariant_measure_observed'], sr.o.obs$inv))
-      add_shelves(shelf, "partial_entropies_observed_unnormalized", cbind(shelf['partial_entropies_observed_unnormalized'], sr.o.obs$locS))
+      if (extensive_output==TRUE) {
+        add_shelves(shelf, "invariant_measure_observed", cbind(shelf['invariant_measure_observed'], sr.o.obs$inv))
+        add_shelves(shelf, "partial_entropies_observed_unnormalized", cbind(shelf['partial_entropies_observed_unnormalized'], sr.o.obs$locS))
+      }
       add_shelves(shelf, "partial_entropies_observed", cbind(shelf['partial_entropies_observed'], sr.o.obs$nlocS))
     } else {
       add_shelves(shelf, "total_entropies_observed", sr.o.obs$SR)
-      add_shelves(shelf, "invariant_measure_observed", sr.o.obs$inv)
-      add_shelves(shelf, "partial_entropies_observed_unnormalized", sr.o.obs$locS)
+      if (extensive_output==TRUE) {
+        add_shelves(shelf, "invariant_measure_observed", sr.o.obs$inv)
+        add_shelves(shelf, "partial_entropies_observed_unnormalized", sr.o.obs$locS)
+      }
       add_shelves(shelf, "partial_entropies_observed", sr.o.obs$nlocS)
     }
     shelf$sync()
   }
   add_annotation_obs(adata, shelf["total_entropies_observed"], "total_entropies_observed")
+  if (extensive_output==TRUE) {
   add_layer(adata, shelf["invariant_measure_observed"], "invariant_measure_observed", transpose=TRUE, compress=FALSE)
   add_layer(adata, shelf["partial_entropies_observed_unnormalized"], "partial_entropies_observed_unnormalized", transpose=TRUE, compress=FALSE)
+  }
   add_layer(adata, shelf["partial_entropies_observed"], "partial_entropies_observed", transpose=TRUE, compress=FALSE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
@@ -1312,8 +1321,10 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
   if (length(adata$obs_names$tolist())<=batch_size) {
   sr.o.fut <- CompSRana(integ.l.fut, local = TRUE, mc.cores = n_cores)
   add_annotation_obs(adata, sr.o.fut$SR, "total_entropies_future")
+  if (extensive_output==TRUE) {
   add_layer(adata, sr.o.fut$inv, "invariant_measure_future", transpose=TRUE, compress=FALSE)
   add_layer(adata, sr.o.fut$locS, "partial_entropies_future_unnormalized", transpose=TRUE, compress=FALSE)
+  }
   add_layer(adata, sr.o.fut$nlocS, "partial_entropies_future", transpose=TRUE, compress=FALSE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
@@ -1336,20 +1347,26 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     }
     if (key_in_shelf(shelf, "partial_entropies_future")=="yes") {
       add_shelves(shelf, "total_entropies_future", c(shelf['total_entropies_future'], sr.o.fut$SR))
+      if (extensive_output==TRUE) {
       add_shelves(shelf, "invariant_measure_future", cbind(shelf['invariant_measure_future'], sr.o.fut$inv))
       add_shelves(shelf, "partial_entropies_future_unnormalized", cbind(shelf['partial_entropies_future_unnormalized'], sr.o.fut$locS))
+      }
       add_shelves(shelf, "partial_entropies_future", cbind(shelf['partial_entropies_future'], sr.o.fut$nlocS))
     } else {
       add_shelves(shelf, "total_entropies_future", sr.o.fut$SR)
+      if (extensive_output==TRUE) {
       add_shelves(shelf, "invariant_measure_future", sr.o.fut$inv)
       add_shelves(shelf, "partial_entropies_future_unnormalized", sr.o.fut$locS)
+      }
       add_shelves(shelf, "partial_entropies_future", sr.o.fut$nlocS)
     }
     shelf$sync()
   }
   add_annotation_obs(adata, shelf["total_entropies_future"], "total_entropies_future")
+  if (extensive_output==TRUE) {
   add_layer(adata, shelf["invariant_measure_future"], "invariant_measure_future", transpose=TRUE, compress=FALSE)
   add_layer(adata, shelf["partial_entropies_future_unnormalized"], "partial_entropies_future_unnormalized", transpose=TRUE, compress=FALSE)
+  }
   add_layer(adata, shelf["partial_entropies_future"], "partial_entropies_future", transpose=TRUE, compress=FALSE)
   if(adata_copy==FALSE) {
     assign(h, adata, envir=.GlobalEnv)
