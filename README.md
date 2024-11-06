@@ -42,7 +42,7 @@ On a Linux system, a working Anaconda environment for `FIERCE` can be set exploi
   According to this installation procedure, a pre-configured working environment can be downloaded on your terminal using the command
 
   ```bash
-  wget https://github.com/bicciatolab/FIERCE/blob/main/docs/FIERCE.yml
+  wget https://raw.githubusercontent.com/bicciatolab/FIERCE/refs/heads/main/docs/FIERCE.yml
   ```
 
   and then cloned with 
