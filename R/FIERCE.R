@@ -1217,10 +1217,16 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
     if (key_in_shelf(shelf, "partial_entropies_observed")=="yes") {
       if (ncol(shelf['partial_entropies_observed'])>=sequence[i]) next
     }
+    integ.l.obs.i <- integ.l.obs
+    if ((sequence[i+1]-sequence[i])>100) {
     cat(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
     cat("\n")
-    integ.l.obs.i <- integ.l.obs
     integ.l.obs.i$expMC <- integ.l.obs.i$expMC[,(sequence[i-1]+1):sequence[i]]
+    } else {
+    cat(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i+1]), "..."))
+    cat("\n")
+    integ.l.obs.i$expMC <- integ.l.obs.i$expMC[,(sequence[i-1]+1):sequence[i+1]]  
+    }
     sr.o.obs <- CompSRana(integ.l.obs.i, local = TRUE, mc.cores = n_cores)
     if (is.null(ncol(sr.o.obs$nlocS))) {
       stop("SCENT algorithm has run out of memory, please re-launch the command with less cores")
