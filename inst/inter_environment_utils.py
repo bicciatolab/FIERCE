@@ -202,9 +202,9 @@ def pca_heatmap(adata, components, use_raw=None, layer=None, filename="pca_heatm
 def draw_embedding(adata, file_name, emb='umap', stream=False, c_as=None, c_type=None, pal=None, c_ord=None, vkey='velocity_of_the_entropy', legend_loc="right margin", alpha=0.3, min_mass=4, add_outline=False, outline_width=(0.1, 0.01)):
 #	from matplotlib.backends.backend_pdf import PdfPages
 	if ((c_as is not None) and (c_type == 'categorical')):
+		if str(adata.obs[c_as].dtype) != 'category':
+			adata.obs[c_as] = pd.Series(adata.obs[c_as], dtype ="category")
 		if c_ord is not None:
-			if str(adata.obs[c_as].dtype) != 'category':
-				adata.obs[c_as] = pd.Series(adata.obs[c_as], dtype ="category")
 			if pal is not None:
 				adata.uns[str(c_as + '_colors')] = np.array(pal, dtype=object)
 			elif str(c_as + '_colors') in adata.uns.keys():
@@ -227,10 +227,8 @@ def draw_embedding(adata, file_name, emb='umap', stream=False, c_as=None, c_type
 		else:
 			if str(c_as + '_colors') not in adata.uns.keys():
 				my_palette = ["#2171b5","#6baed6","#c6dbef","#cb181d","yellow","#fcbba1","orange","#74c476","#c7e9c0","#525252","#969696","#d9d9d9", "#762a83","#9970ab","#c2a5cf","#e7d4e8","#d9f0d3","#a6dba0","#5aae61","#1b7837","#f7f4f9","#e7e1ef","#d4b9da","#c994c7","#df65b0","#e7298a","#ce1256","#980043","#67001f","#7f2704"]
-				if str(adata.obs[c_as].dtype) != 'category':
-					adata.obs[c_as] = pd.Series(adata.obs[c_as], dtype ="category")
 				adata.uns[str(c_as + '_colors')] = np.array(my_palette[0:len(adata.obs[c_as].cat.categories)], dtype=object)
-	if (c_type == 'numeric'):
+	elif ((c_as is not None) and (c_type == 'numeric')):
 		colmap = 'viridis'
 	else:
 		colmap = None
