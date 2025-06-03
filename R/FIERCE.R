@@ -1646,7 +1646,11 @@ plot_entropy_results <- function(adata, project_dir="./FIERCE_results", phenotyp
   }
 
   # boxplot of expressed genes (ONLY genes used by SCENT) VS phenotypic labels of interest
-  expression_matrix <- t(as.matrix(adata$X$todense()))
+  if (class(adata$X)[1]=="matrix") {
+    expression_matrix <- t(as.matrix(adata$X))
+  } else {
+    expression_matrix <- t(as.matrix(adata$X$todense()))
+  }  
   expr.v <- apply(expression_matrix, 2, function(x) sum(x>0)) #count all genes with expr > 0 per cell
 
   cat("Boxplot expressed genes vs phenotype labels...")
