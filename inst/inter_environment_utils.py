@@ -228,6 +228,7 @@ def draw_embedding(adata, file_name, emb='umap', stream=False, c_as=None, c_type
 			if str(c_as + '_colors') not in adata.uns.keys():
 				my_palette = ["#2171b5","#6baed6","#c6dbef","#cb181d","yellow","#fcbba1","orange","#74c476","#c7e9c0","#525252","#969696","#d9d9d9", "#762a83","#9970ab","#c2a5cf","#e7d4e8","#d9f0d3","#a6dba0","#5aae61","#1b7837","#f7f4f9","#e7e1ef","#d4b9da","#c994c7","#df65b0","#e7298a","#ce1256","#980043","#67001f","#7f2704"]
 				adata.uns[str(c_as + '_colors')] = np.array(my_palette[0:len(adata.obs[c_as].cat.categories)], dtype=object)
+		colmap = None
 	elif ((c_as is not None) and (c_type == 'numeric')):
 		colmap = 'viridis'
 	else:
