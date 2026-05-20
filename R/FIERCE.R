@@ -1218,7 +1218,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
       if (ncol(shelf['partial_entropies_observed'])>=sequence[i]) next
     }
     integ.l.obs.i <- integ.l.obs
-    if ((sequence[i+1]-sequence[i])>100) {
+    if (i==length(sequence) | (sequence[i+1]-sequence[i])>100) {
     cat(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
     cat("\n")
     integ.l.obs.i$expMC <- integ.l.obs.i$expMC[,(sequence[i-1]+1):sequence[i]]
@@ -1344,7 +1344,7 @@ compute_signaling_entropy <- function(adata, use_raw=FALSE, log_transform_input_
       if (ncol(shelf['partial_entropies_future'])>=sequence[i]) next
     }
     integ.l.fut.i <- integ.l.fut
-    if ((sequence[i+1]-sequence[i])>100) {
+    if (i==length(sequence) | (sequence[i+1]-sequence[i])>100) {
     cat(paste0("Parsing cells from ", as.character(sequence[i-1]+1), " to ", as.character(sequence[i]), "..."))
     cat("\n")
     integ.l.fut.i$expMC <- integ.l.fut.i$expMC[,(sequence[i-1]+1):sequence[i]]
